@@ -48,7 +48,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root
+            cd /root/bron
             docker compose down || true
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/tezbron:latest
             docker compose up -d
