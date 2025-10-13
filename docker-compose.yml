@@ -1,21 +1,20 @@
 version: '3'
 services:
   app-bron:
-    build: .
+    image: bron-app:latest  # Docker Hub'dan pull qilinadi
     container_name: bron
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dbquiz:5432/dbquiz
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dbquiz:5432/dbbron
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TZ=Asia/Tashkent
     ports:
       - "5002:8080"
-
     restart: always
-
     networks:
       - log
-
-volumes:
-  pgdata_bron:
+    depends_on:
+      - dbquiz
 
 networks:
   log:
