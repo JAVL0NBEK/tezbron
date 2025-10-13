@@ -1,14 +1,14 @@
-# Use lightweight OpenJDK base image
+# Java 19 JDK bazaviy imij
 FROM openjdk:19-jdk-alpine
 
-# Set working directory
+# Konteyner ichida ishchi papka
 WORKDIR /bron
 
-# Copy the JAR file
-COPY build/libs/bron-0.0.1-SNAPSHOT.jar bron-0.0.1-SNAPSHOT.jar
+# Maven build natijasini kopyalash (target papkadan)
+COPY target/bron-0.0.1-SNAPSHOT.jar bron-0.0.1-SNAPSHOT.jar
 
-# Expose app port
+# Ilova porti
 EXPOSE 8080
 
-# Run Spring Boot app with prod profile
+# Prod profil bilan ishga tushirish
 CMD ["java", "-jar", "bron-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
