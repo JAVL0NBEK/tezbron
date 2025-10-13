@@ -54,7 +54,6 @@ jobs:
 
             docker compose down
 
-            echo "⬇️ Pulling new image from Docker Hub..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/bron-app:latest
 
             echo "🚀 Starting new containers..."
