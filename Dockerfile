@@ -1,14 +1,13 @@
-# Use an appropriate base image that contains the JDK and other necessary tools
 FROM openjdk:19-jdk-alpine
 
-# Set the working directory in the container
+# === Working directory ===
 WORKDIR /bron
 
-# Copy the jar file (only the fat jar, NOT plain.jar)
-COPY build/libs/bron-0.0.1-SNAPSHOT.jar bron-0.0.1-SNAPSHOT.jar
+# === Copy JAR file ===
+COPY build/libs/bron-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port the application runs on
+# === Expose port ===
 EXPOSE 8080
 
-# Run the jar file
-CMD ["java", "-jar", "bron-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
+# === Run the app with prod profile ===
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
