@@ -1,5 +1,5 @@
 FROM openjdk:19-jdk-alpine
-WORKDIR /app
+WORKDIR /bron
 COPY . .
 RUN apk add --no-cache bash
 RUN chmod +x gradlew
