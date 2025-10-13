@@ -1,18 +1,40 @@
-version: '3'
+version: "3.9"
+
 services:
-  app-bron:
-    image: ${DOCKER_HUB_USERNAME}/bron-app:latest
-    container_name: bron
+  dbquiz:
+    image: postgres:16
+    container_name: dbquiz
+    restart: always
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dbquiz:5432/dbbron
-      - TZ=Asia/Tashkent
+      POSTGRES_DB: dbbron
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_bron:/var/lib/postgresql/data
+    networks:
+      - log
+
+  app-bron:
+    build: .
+    image: bron-app:latest
+    container_name: bron
+    depends_on:
+      - dbquiz
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TZ: Asia/Tashkent
     ports:
       - "5002:8080"
     restart: always
     networks:
       - log
-    depends_on:
-      - dbquiz
+
+volumes:
+  pgdata_bron:
 
 networks:
   log:
