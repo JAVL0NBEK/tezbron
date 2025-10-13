@@ -3,7 +3,7 @@ name: 🚀 Auto Deploy to VPS
 on:
   push:
     branches:
-      - main  # faqat main branch push bo‘lganda ishga tushadi
+      - master  # faqat main branch push bo‘lganda ishga tushadi
 
 jobs:
   build-and-deploy:
