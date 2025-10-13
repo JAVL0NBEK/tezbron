@@ -56,7 +56,7 @@ jobs:
 
             docker pull ${{ secrets.DOCKER_HUB_USERNAME}}/bron-app:latest
 
-            echo "🚀 Starting new containers..."
+            echo "Starting new containers..."
             docker compose up -d --build
 
-            echo "✅ Deployment completed successfully!"
+            echo "Deployment completed successfully!"
