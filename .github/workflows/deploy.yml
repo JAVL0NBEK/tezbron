@@ -22,7 +22,7 @@ jobs:
         env:
           SERVER_USER: "root"
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          PROJECT_DIR: "/bron"
+          PROJECT_DIR: "/root/bron"
         run: |
           # Copy project
           # Run deployment commands with debugging
