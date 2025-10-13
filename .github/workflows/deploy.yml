@@ -3,7 +3,7 @@ name: 🚀 Auto Deploy to VPS
 on:
   push:
     branches:
-      - master  # faqat main branch push bo‘lganda ishga tushadi
+      - master  # faqat master branch push bo‘lganda ishga tushadi
 
 jobs:
   build-and-deploy:
@@ -21,42 +21,46 @@ jobs:
           java-version: '19'
           distribution: 'temurin'
 
-      # === 3. Projectni build qilish (Gradle bilan) ===
-      - name: Build project
+      # === 3. Gradle build uchun ruxsat ===
+      - name: Grant execute permission for Gradle
+        run: chmod +x ./gradlew
+
+      # === 4. Projectni build qilish ===
+      - name: Build project (Gradle)
         run: ./gradlew clean build -x test
 
-      # === 4. Docker Hub login ===
+      # === 5. Docker Hub login ===
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME}}
-          password: ${{ secrets.DOCKER_HUB_TOKEN}}
+          username: ${{secrets.DOCKER_HUB_USERNAME}}
+          password: ${{secrets.DOCKER_HUB_TOKEN}}
 
-      # === 5. Docker image yaratish ===
+      # === 6. Docker image yaratish ===
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME}}/bron-app:latest .
+        run: docker build -t ${{secrets.DOCKER_HUB_USERNAME}}/bron-app:latest .
 
-      # === 6. Docker image’ni push qilish ===
+      # === 7. Docker image’ni push qilish ===
       - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME}}/bron-app:latest
+        run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/bron-app:latest
 
-      # === 7. VPS serverga deploy qilish ===
+      # === 8. VPS serverga deploy qilish ===
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{secrets.SERVER_IP}}
+          username: ${{secrets.SERVER_USERNAME}}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
           script: |
             cd /root/bron
 
+            echo "🧹 Stopping old containers..."
             docker compose down
 
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME}}/bron-app:latest
+            echo "📦 Pulling new image..."
+            docker pull ${{secrets.DOCKER_HUB_USERNAME}}/bron-app:latest
 
-            echo "Starting new containers..."
+            echo "🚀 Starting new containers..."
             docker compose up -d --build
 
-            echo "Deployment completed successfully!"
+            echo "✅ Deployment completed successfully!"
