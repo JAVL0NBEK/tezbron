@@ -24,31 +24,21 @@ jobs:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           PROJECT_DIR: "/root/bron"
         run: |
-          # === Copy project to server ===
-          rsync -avz --exclude '.git' --exclude '.github' --exclude 'build' 
-           -e "ssh -p 22 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
-
-          # === Run deployment commands ===
-          ssh -p 22 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
-            cd $PROJECT_DIR &&
-            ls -la &&
-            java -version &&
-            gradle -v || ./gradlew -v &&
-
-            # === Build project with Gradle ===
-            if [ -f ./gradlew ]; then
-              chmod +x ./gradlew
-              ./gradlew clean build -x test
-            else
-              gradle clean build -x test
-            fi &&
-
-            # === Deploy with Docker ===
-            docker --version &&
-            docker compose version &&
-            docker compose up --build -d &&
-
-            # === Cleanup ===
-            docker builder prune -af &&
-            docker image prune -af
+          # Copy project
+          
+          rsync -avz -e "ssh -p 2222 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
+          
+          # Run deployment commands with debugging
+          ssh -p 2222 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
+          cd $PROJECT_DIR &&
+          ls -la &&
+          java -version &&
+          export PATH=/opt/apache-maven/bin:$PATH &&
+          mvn -version &&
+          mvn clean package -DskipTests &&
+          docker --version &&
+          docker compose version &&
+          docker compose up --build -d &&
+          docker builder prune -af &&
+          docker image prune -af
           "
