@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - master
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -14,30 +16,38 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Copy project to server and deploy
         env:
-          SERVER_USER: ${{secrets.SERVER_USERNAME}}
-          SERVER_IP: ${{secrets.SERVER_IP}}
+          SERVER_USER: ${{ secrets.SERVER_USERNAME }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
           PROJECT_DIR: "/root/bron"
         run: |
-          # Copy project
-          
+          # === Copy project to server ===
           rsync -avz -e "ssh -p 22 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
 
-          # Run deployment commands with debugging
+          # === Run deployment commands ===
           ssh -p 22 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
-          cd $PROJECT_DIR &&
-          ls -la &&
-          java -version &&
-          export PATH=/opt/apache-maven/bin:$PATH &&
-          mvn -version &&
-          mvn clean package -DskipTests &&
-          docker --version &&
-          docker compose version &&
-          docker compose up --build -d &&
-          docker builder prune -af &&
-          docker image prune -af
-          "
+            cd $PROJECT_DIR &&
+            ls -la &&
+            java -version &&
+            gradle -v || ./gradlew -v &&
 
+            # === Build project with Gradle ===
+            if [ -f ./gradlew ]; then
+              chmod +x ./gradlew
+              ./gradlew clean build -x test
+            else
+              gradle clean build -x test
+            fi &&
+
+            # === Deploy with Docker ===
+            docker --version &&
+            docker compose version &&
+            docker compose up --build -d &&
+
+            # === Cleanup ===
+            docker builder prune -af &&
+            docker image prune -af
+          "
