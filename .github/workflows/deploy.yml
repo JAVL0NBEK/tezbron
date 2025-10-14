@@ -26,10 +26,10 @@ jobs:
         run: |
           # Copy project
           
-          rsync -avz -e "ssh -p 2222 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
+          rsync -avz -e "ssh -p 22 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
           
           # Run deployment commands with debugging
-          ssh -p 2222 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
+          ssh -p 22 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
           cd $PROJECT_DIR &&
           ls -la &&
           java -version &&
