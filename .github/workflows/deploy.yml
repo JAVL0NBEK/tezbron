@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -20,30 +18,25 @@ jobs:
 
       - name: Copy project to server and deploy
         env:
-          SERVER_USER: ${{ secrets.SERVER_USERNAME }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: "root"
+          SERVER_IP: "83.222.19.225"
           PROJECT_DIR: "/root/bron"
         run: |
-          # === Copy project to server ===
+          # Copy project
+          
           rsync -avz -e "ssh -p 22 -o StrictHostKeyChecking=no" . $SERVER_USER@$SERVER_IP:$PROJECT_DIR
 
-          # === Run deployment commands ===
+          # Run deployment commands with debugging
           ssh -p 22 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
-            set -e  # xatolik bo‘lsa, to‘xtasin
-            cd $PROJECT_DIR &&
-            ls -la &&
-            java -version &&
-
-            # === Build project with Gradle Wrapper ===
-            chmod +x ./gradlew
-            ./gradlew clean build --no-daemon -x test &&
-
-            # === Deploy with Docker ===
-            docker --version &&
-            docker compose version &&
-            docker compose up --build -d &&
-
-            # === Cleanup ===
-            docker builder prune -af &&
-            docker image prune -af
+          cd $PROJECT_DIR &&
+          ls -la &&
+          java -version &&
+          export PATH=/opt/apache-maven/bin:$PATH &&
+          mvn -version &&
+          mvn clean package -DskipTests &&
+          docker --version &&
+          docker compose version &&
+          docker compose up --build -d &&
+          docker builder prune -af &&
+          docker image prune -af
           "
