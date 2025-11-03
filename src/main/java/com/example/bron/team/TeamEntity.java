@@ -22,7 +22,7 @@ public class TeamEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "captain_id")
     private UserEntity captain;
 

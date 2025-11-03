@@ -3,17 +3,21 @@ package com.example.bron.user;
 import com.example.bron.booking.BookingEntity;
 import com.example.bron.enums.Role;
 import com.example.bron.team.TeamEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@NoArgsConstructor
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +25,6 @@ public class UserEntity {
 
     @Column(unique = true, nullable = false)
     private String username;
-
-    @Column(unique = true, nullable = false)
-    private String email;
 
     @Column(nullable = false)
     private String passwordHash;
@@ -36,6 +37,7 @@ public class UserEntity {
     private String fullName;
     private String profileImageUrl;
 
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private String location;
 

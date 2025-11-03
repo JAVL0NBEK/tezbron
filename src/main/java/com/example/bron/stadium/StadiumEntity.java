@@ -1,6 +1,7 @@
 package com.example.bron.stadium;
 
 import com.example.bron.booking.BookingEntity;
+import com.example.bron.enums.Duration;
 import com.example.bron.enums.StadiumType;
 import com.example.bron.match.MatchEntity;
 import com.example.bron.user.UserEntity;
@@ -24,18 +25,23 @@ public class StadiumEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private UserEntity owner;
 
     private String description;
 
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb", nullable = false)
     private String location;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StadiumType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Duration duration;
 
     private Integer capacity;
     private Double pricePerHour;
@@ -44,8 +50,9 @@ public class StadiumEntity {
     @Column(columnDefinition = "jsonb", name = "images")
     private List<String> images;
 
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
-    private String availabilitySlots;
+    private String availabilitySlots; // vaqt bolimlari
 
     private Boolean isActive;
 

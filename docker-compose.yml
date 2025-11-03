@@ -1,24 +1,41 @@
-version: "3.9"
+version: '3.9'
 
 services:
   app-bron:
     build: .
-    image: bron-app:latest
     container_name: bron
     environment:
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      TZ: Asia/Tashkent
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dbbron:5432/dbbron
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Asia/Tashkent
     ports:
       - "5002:8080"
+    depends_on:
+      - dbbron
+    restart: always
+    networks:
+      - log
+
+  dbbron:
+    image: postgres:16.1-alpine
+    container_name: dbbron
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dbbron
+      - PGDATA=/var/lib/postgresql/data/pgdata1
+    ports:
+      - "9001:5432"
+    volumes:
+      - pgdata1:/var/lib/postgresql/data
     restart: always
     networks:
       - log
 
 volumes:
-  pgdata_bron:
-    external: true
+  pgdata1:
 
 networks:
   log:

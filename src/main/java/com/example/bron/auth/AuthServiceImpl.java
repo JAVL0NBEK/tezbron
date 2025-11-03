@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     @Override
-    public LoginResponseDto login(LoginRequestDto loginRequest) {
-        if (loginRequest.getLogin().equals("admin") && loginRequest.getPassword().equals("admin")) {
-            return new LoginResponseDto("admin","admin","admin");
-        }
-        return null;
+    public LoginResponseDto login(LoginRequestDto dto) {
+        return new LoginResponseDto(dto.getLogin(),dto.getPassword());
     }
 }
