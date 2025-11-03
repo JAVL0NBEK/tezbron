@@ -24,11 +24,11 @@ public class MatchEntity {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
     private UserEntity organizer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stadium_id")
     private StadiumEntity stadium;
 

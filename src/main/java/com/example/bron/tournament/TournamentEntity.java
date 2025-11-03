@@ -20,7 +20,7 @@ public class TournamentEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
     private UserEntity organizer;
 
