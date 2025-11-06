@@ -2,11 +2,8 @@ package com.example.bron.match;
 
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
-import com.example.bron.stadium.StadiumEntity;
 import com.example.bron.stadium.dto.AvailabilitySlotRequestDto;
 import com.example.bron.stadium.dto.LocationDto;
-import com.example.bron.stadium.dto.StadiumRequestDto;
-import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
