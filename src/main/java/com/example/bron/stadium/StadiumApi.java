@@ -16,14 +16,15 @@ public interface StadiumApi {
     ResponseEntity<StadiumResponseDto> create(@RequestBody StadiumRequestDto stadiumRequestDto);
 
     @PutMapping("/{id}")
-    public ResponseEntity<StadiumResponseDto> update(@PathVariable Long id, @RequestBody StadiumRequestDto dto);
+    ResponseEntity<StadiumResponseDto> update(@PathVariable Long id,
+        @RequestBody StadiumRequestDto dto);
 
     @GetMapping("/{id}")
-    public ResponseEntity<StadiumResponseDto> getById(@PathVariable Long id);
+    ResponseEntity<StadiumResponseDto> getById(@PathVariable Long id);
 
     @GetMapping
-    public ResponseEntity<List<StadiumResponseDto>> getAll();
+    ResponseEntity<List<StadiumResponseDto>> getAll();
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id);
+    ResponseEntity<Void> delete(@PathVariable Long id);
 }

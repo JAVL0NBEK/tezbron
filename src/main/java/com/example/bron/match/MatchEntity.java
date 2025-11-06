@@ -1,5 +1,6 @@
 package com.example.bron.match;
 
+import com.example.bron.enums.Duration;
 import com.example.bron.enums.MatchStatus;
 import com.example.bron.stadium.StadiumEntity;
 import com.example.bron.user.UserEntity;
@@ -35,7 +36,10 @@ public class MatchEntity {
     @Column(nullable = false)
     private LocalDateTime dateTime;
 
-    private Integer duration;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Duration duration;
+
     private Integer maxPlayers;
     private Integer currentPlayers;
     private Double pricePerPlayer;
@@ -47,6 +51,7 @@ public class MatchEntity {
     @Column(columnDefinition = "jsonb", name = "participants")
     private List<Long> participants;
 
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private String location;
 

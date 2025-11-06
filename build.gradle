@@ -35,6 +35,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.8.3'
+
+    // Redis cache uchun
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // (ixtiyoriy, ammo tavsiya etiladi) Lettuce — Redis uchun default client
+    implementation 'io.lettuce:lettuce-core'
+
+    // (ixtiyoriy) JSON formatida Redisda saqlash uchun
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
