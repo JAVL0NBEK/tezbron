@@ -1,6 +1,6 @@
 package com.example.bron.match;
 
-import com.example.bron.exception.ResourceNotFoundException;
+import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
 import com.example.bron.stadium.StadiumRepository;
@@ -20,10 +20,10 @@ public class MatchServiceImpl implements MatchService{
   @Override
   public MatchResponseDto create(MatchRequestDto dto) {
     var organizer = userRepository.findById(dto.getOrganizerId())
-        .orElseThrow(() -> new ResourceNotFoundException("organizer_not_found",List.of(dto.getOrganizerId().toString())));
+        .orElseThrow(() -> new NotFoundException("organizer_not_found",List.of(dto.getOrganizerId().toString())));
 
     var stadium = stadiumRepository.findById(dto.getStadiumId())
-        .orElseThrow(() -> new ResourceNotFoundException("stadium_not_found",List.of(dto.getStadiumId().toString())));
+        .orElseThrow(() -> new NotFoundException("stadium_not_found",List.of(dto.getStadiumId().toString())));
     var matchEntity = mapper.toEntity(dto);
     matchEntity.setStadium(stadium);
     matchEntity.setOrganizer(organizer);
@@ -56,6 +56,6 @@ public class MatchServiceImpl implements MatchService{
 
   private MatchEntity getFindById(Long id) {
     return matchRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("match_not_found",List.of(id.toString())));
+        .orElseThrow(() -> new NotFoundException("match_not_found",List.of(id.toString())));
   }
 }

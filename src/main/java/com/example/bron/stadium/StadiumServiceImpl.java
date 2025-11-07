@@ -1,6 +1,6 @@
 package com.example.bron.stadium;
 
-import com.example.bron.exception.ResourceNotFoundException;
+import com.example.bron.exception.NotFoundException;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.user.UserRepository;
@@ -19,7 +19,7 @@ public class StadiumServiceImpl implements StadiumService {
     @Override
     public StadiumResponseDto create(StadiumRequestDto dto) {
         var owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+                .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
         var stadium = mapper.toEntity(dto);
         stadium.setOwner(owner);
         var saved =  stadiumRepository.save(stadium);
@@ -32,7 +32,7 @@ public class StadiumServiceImpl implements StadiumService {
     public StadiumResponseDto update(Long id, StadiumRequestDto dto) {
         var entity = getFindById(id);
         var owner = userRepository.findById(dto.getOwnerId())
-          .orElseThrow(() -> new ResourceNotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+          .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
         mapper.updateEntity(entity, dto);
 
         StadiumEntity updated = stadiumRepository.save(entity);
@@ -43,7 +43,7 @@ public class StadiumServiceImpl implements StadiumService {
 
     private StadiumEntity getFindById(Long id) {
         return stadiumRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("stadium_not_found",List.of(id.toString())));
+                .orElseThrow(() -> new NotFoundException("stadium_not_found",List.of(id.toString())));
     }
 
     @Override

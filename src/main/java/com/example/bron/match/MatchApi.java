@@ -1,5 +1,6 @@
 package com.example.bron.match;
 
+import com.example.bron.common.BaseResponse;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,18 +18,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "Matches Management APIs", description = "Endpoints for managing matches")
 public interface MatchApi {
   @PostMapping("/create")
-  ResponseEntity<MatchResponseDto> create(@RequestBody MatchRequestDto dto);
+  ResponseEntity<BaseResponse<MatchResponseDto>> create(@RequestBody MatchRequestDto dto);
 
   @PutMapping("/{id}")
-  ResponseEntity<MatchResponseDto> update(@PathVariable Long id,
+  ResponseEntity<BaseResponse<MatchResponseDto>> update(@PathVariable Long id,
       @RequestBody MatchRequestDto dto);
 
   @GetMapping("/{id}")
-  ResponseEntity<MatchResponseDto> getById(@PathVariable Long id);
+  ResponseEntity<BaseResponse<MatchResponseDto>> getById(@PathVariable Long id);
 
   @GetMapping
-  ResponseEntity<List<MatchResponseDto>> getAll();
+  ResponseEntity<BaseResponse<List<MatchResponseDto>>> getAll();
 
   @DeleteMapping("/{id}")
-  ResponseEntity<Void> delete(@PathVariable Long id);
+  ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);
 }
