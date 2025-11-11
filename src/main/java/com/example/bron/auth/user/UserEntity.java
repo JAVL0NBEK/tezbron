@@ -1,4 +1,4 @@
-package com.example.bron.user;
+package com.example.bron.auth.user;
 
 import com.example.bron.booking.BookingEntity;
 import com.example.bron.enums.Role;

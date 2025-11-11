@@ -1,4 +1,4 @@
-package com.example.bron.auth;
+package com.example.bron.auth.otp;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

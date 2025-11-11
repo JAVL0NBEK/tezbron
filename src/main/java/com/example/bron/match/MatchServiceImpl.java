@@ -4,7 +4,7 @@ import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
 import com.example.bron.stadium.StadiumRepository;
-import com.example.bron.user.UserRepository;
+import com.example.bron.auth.user.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package com.example.bron.stadium;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
-import com.example.bron.user.UserRepository;
+import com.example.bron.auth.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

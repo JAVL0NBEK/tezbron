@@ -3,7 +3,7 @@ package com.example.bron.match;
 import com.example.bron.enums.Duration;
 import com.example.bron.enums.MatchStatus;
 import com.example.bron.stadium.StadiumEntity;
-import com.example.bron.user.UserEntity;
+import com.example.bron.auth.user.UserEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;

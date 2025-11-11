@@ -1,4 +1,4 @@
-package com.example.bron.auth;
+package com.example.bron.auth.otp;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

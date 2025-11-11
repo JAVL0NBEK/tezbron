@@ -1,6 +1,6 @@
 package com.example.bron.team;
 
-import com.example.bron.user.UserEntity;
+import com.example.bron.auth.user.UserEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;

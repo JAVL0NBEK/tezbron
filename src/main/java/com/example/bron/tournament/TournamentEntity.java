@@ -1,7 +1,7 @@
 package com.example.bron.tournament;
 
 import com.example.bron.enums.TournamentStatus;
-import com.example.bron.user.UserEntity;
+import com.example.bron.auth.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

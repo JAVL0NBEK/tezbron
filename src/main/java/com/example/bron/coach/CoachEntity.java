@@ -1,6 +1,6 @@
 package com.example.bron.coach;
 
-import com.example.bron.user.UserEntity;
+import com.example.bron.auth.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,10 +24,8 @@ public class CoachEntity {
 
     private Double hourlyRate;
 
-    @Column(columnDefinition = "jsonb")
     private String availability;
 
-    @Column(columnDefinition = "jsonb")
     private String reviews;
 
 }

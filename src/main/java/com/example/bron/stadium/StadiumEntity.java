@@ -4,7 +4,7 @@ import com.example.bron.booking.BookingEntity;
 import com.example.bron.enums.Duration;
 import com.example.bron.enums.StadiumType;
 import com.example.bron.match.MatchEntity;
-import com.example.bron.user.UserEntity;
+import com.example.bron.auth.user.UserEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
