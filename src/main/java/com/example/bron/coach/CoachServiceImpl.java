@@ -18,7 +18,7 @@ public class CoachServiceImpl implements CoachService {
   @Override
   public CoachResponseDto createStadium(CoachRequestDto dto) {
     var user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
-        new NotFoundException("user_not_fount",List.of(dto.getUserId().toString())));
+        new NotFoundException("stadium_user_not_fount",List.of(dto.getUserId().toString())));
     var coach = mapper.toEntity(dto);
     coach.setUser(user);
     var saved  = coachRepository.save(coach);
@@ -47,6 +47,6 @@ public class CoachServiceImpl implements CoachService {
   }
 
   private CoachEntity getById(Long id) {
-    return coachRepository.findById(id).orElseThrow(() -> new NotFoundException("coach_not_found",List.of(id.toString())));
+    return coachRepository.findById(id).orElseThrow(() -> new NotFoundException("stadium_coach_not_found",List.of(id.toString())));
   }
 }

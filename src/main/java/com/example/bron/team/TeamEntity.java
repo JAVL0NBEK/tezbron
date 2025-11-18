@@ -29,9 +29,13 @@ public class TeamEntity {
     @Column(nullable = false)
     private String sportType;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "members")
-    private List<Long> members;
+    @ElementCollection
+    @CollectionTable(
+      name = "team_members",
+      joinColumns = @JoinColumn(name = "team_id")
+    )
+    @Column(name = "member_id")
+    private List<Long> memberIds;
 
     private String description;
 
