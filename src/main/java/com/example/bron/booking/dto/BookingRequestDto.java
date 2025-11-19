@@ -1,7 +1,6 @@
 package com.example.bron.booking.dto;
 
 import com.example.bron.enums.BookingStatus;
-import com.example.bron.match.MatchEntity;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
