@@ -1,9 +1,14 @@
 package com.example.bron.stadium;
 
 import com.example.bron.common.BaseResponse;
+import com.example.bron.enums.StadiumDuration;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +26,14 @@ public interface StadiumApi {
       @RequestBody StadiumRequestDto dto);
 
   @GetMapping("/{id}")
-  ResponseEntity<BaseResponse<StadiumResponseDto>> getById(@PathVariable Long id);
+  ResponseEntity<BaseResponse<List<StadiumResponseDto>>> getById(
+      @PathVariable Long id,
+      @RequestParam("date") LocalDate date,
+      @RequestParam("duration") StadiumDuration duration
+  );
 
   @GetMapping
-  ResponseEntity<BaseResponse<List<StadiumResponseDto>>> getAll();
+  ResponseEntity<BaseResponse<Page<StadiumResponseDto>>> getAll(StadiumFilterParams filterParams, Pageable pageable);
 
   @DeleteMapping("/{id}")
   ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);

@@ -1,10 +1,12 @@
 package com.example.bron.stadium;
 
 import com.example.bron.booking.BookingEntity;
-import com.example.bron.enums.Duration;
+import com.example.bron.common.FileResponseDto;
+import com.example.bron.enums.StadiumDuration;
 import com.example.bron.enums.StadiumType;
 import com.example.bron.match.MatchEntity;
 import com.example.bron.auth.user.UserEntity;
+import com.example.bron.stadium.dto.LocationDto;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,7 +35,7 @@ public class StadiumEntity {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb", nullable = false)
-    private String location;
+    private LocationDto location;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,18 +43,14 @@ public class StadiumEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Duration duration;
+    private StadiumDuration duration;
 
     private Integer capacity;
     private Double pricePerHour;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb", name = "images")
-    private List<String> images;
-
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private String availabilitySlots; // vaqt bolimlari
+    private List<FileResponseDto> images;
 
     private Boolean isActive;
 

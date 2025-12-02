@@ -6,6 +6,7 @@ import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.MatchRepository;
 import com.example.bron.stadium.StadiumRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,17 @@ public class BookingServiceImpl implements BookingService {
     var entity = bookingMapper.toEntity(requestDto);
     var user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
         new NotFoundException("booking_user_not_fount",List.of(requestDto.getUserId().toString())));
-    var match = matchRepository.findById(requestDto.getMatchId()).orElseThrow(() ->
-        new NotFoundException("booking_match_not_found",List.of(requestDto.getMatchId().toString())));
     var stadium = stadiumRepository.findById(requestDto.getStadiumId()).orElseThrow(() ->
         new NotFoundException("booking_stadium_not_found",List.of(requestDto.getStadiumId().toString())));
-    entity.setMatch(match);
+    if (requestDto.getMatchId() != null) {
+      var match = matchRepository.findById(requestDto.getMatchId()).orElseThrow(() ->
+          new NotFoundException("booking_match_not_found",List.of(requestDto.getMatchId().toString())));
+      entity.setMatch(match);
+    } else {
+      entity.setMatch(null);
+    }
+
+    entity.setCreatedAt(LocalDateTime.now());
     entity.setStadium(stadium);
     entity.setUser(user);
     var saved = bookingRepository.save(entity);

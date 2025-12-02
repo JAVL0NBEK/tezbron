@@ -1,6 +1,8 @@
 package com.example.bron.stadium.dto;
 
+import com.example.bron.common.FileResponseDto;
 import com.example.bron.enums.Duration;
+import com.example.bron.enums.StadiumDuration;
 import com.example.bron.enums.StadiumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +19,9 @@ public class StadiumRequestDto {
     private String description;
     private LocationDto location; // JSON string ({"lat":..., "lng":...})
     private StadiumType type;
-    private Duration duration;
+    private StadiumDuration duration;
     private Integer capacity;
     private Double pricePerHour;
-    private List<String> images;
-    private List<AvailabilitySlotRequestDto> availabilitySlots; // JSON vaqt oraliqlari
+    private List<FileResponseDto> images;
     private Boolean isActive;
 }

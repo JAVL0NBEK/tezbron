@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class AvailabilitySlotRequestDto {
   private String day;
   private String start;
-  private String end;
 }

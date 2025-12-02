@@ -1,9 +1,14 @@
 package com.example.bron.stadium;
 
 import com.example.bron.common.BaseResponse;
+import com.example.bron.enums.StadiumDuration;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
+import java.time.LocalDate;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,14 +34,14 @@ public class StadiumController implements StadiumApi {
   }
 
   @Override
-  public ResponseEntity<BaseResponse<StadiumResponseDto>> getById(Long id) {
-    StadiumResponseDto response = stadiumService.getById(id);
+  public ResponseEntity<BaseResponse<List<StadiumResponseDto>>> getById(Long id, LocalDate date, StadiumDuration duration) {
+    var response = stadiumService.getById(id, date, duration);
     return ResponseEntity.ok(BaseResponse.ok(response));
   }
 
   @Override
-  public ResponseEntity<BaseResponse<List<StadiumResponseDto>>> getAll() {
-    List<StadiumResponseDto> list = stadiumService.getAll();
+  public ResponseEntity<BaseResponse<Page<StadiumResponseDto>>> getAll(StadiumFilterParams filterParams, Pageable pageable) {
+    var list = stadiumService.getAll(filterParams, pageable);
     return ResponseEntity.ok(BaseResponse.ok(list));
   }
 
