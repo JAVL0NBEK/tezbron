@@ -3,6 +3,7 @@ package com.example.bron.auth.user;
 import com.example.bron.booking.BookingEntity;
 import com.example.bron.enums.Role;
 import com.example.bron.team.TeamEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -45,9 +46,11 @@ public class UserEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<BookingEntity> bookings;
 
     @OneToMany(mappedBy = "captain")
+    @JsonIgnore
     private List<TeamEntity> teams;
 
 }
