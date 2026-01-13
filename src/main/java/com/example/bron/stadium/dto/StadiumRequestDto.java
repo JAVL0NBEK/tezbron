@@ -16,6 +16,8 @@ import java.util.List;
 public class StadiumRequestDto {
     private String name;
     private Long ownerId;
+    private Long regionId;
+    private Long districtId;
     private String description;
     private LocationDto location; // JSON string ({"lat":..., "lng":...})
     private StadiumType type;

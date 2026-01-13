@@ -1,5 +1,6 @@
 package com.example.bron.stadiumrating;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,5 +21,7 @@ public interface StadiumRatingRepository extends JpaRepository<StadiumRatingEnti
     where r.stadium.id = :stadiumId
 """)
   Long getRatingCount(Long stadiumId);
+
+  List<StadiumRatingEntity> findAllByStadiumId(Long stadiumId);
 
 }

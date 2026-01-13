@@ -24,6 +24,8 @@ public interface StadiumMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "owner", ignore = true)
+  @Mapping(target = "region", ignore = true)
+  @Mapping(target = "district", ignore = true)
   @Mapping(target = "bookings", ignore = true)
   @Mapping(target = "matches", ignore = true)
   StadiumEntity toEntity(StadiumRequestDto dto);

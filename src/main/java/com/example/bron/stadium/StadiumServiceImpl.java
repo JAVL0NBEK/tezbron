@@ -4,6 +4,8 @@ import com.example.bron.booking.BookingEntity;
 import com.example.bron.booking.BookingRepository;
 import com.example.bron.enums.StadiumDuration;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.location.DistrictRepository;
+import com.example.bron.location.RegionRepository;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.auth.user.UserRepository;
@@ -28,13 +30,23 @@ public class StadiumServiceImpl implements StadiumService {
     private final BookingRepository bookingRepository;
     private final  StadiumMapper mapper;
     private final UserRepository userRepository;
+    private final RegionRepository regionRepository;
+    private final DistrictRepository districtRepository;
 
     @Override
     public StadiumResponseDto create(StadiumRequestDto dto) {
         var owner = userRepository.findById(dto.getOwnerId())
                 .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+
+        var region = regionRepository.findById(dto.getRegionId())
+                .orElseThrow(() -> new NotFoundException("region_not_found",List.of(dto.getRegionId().toString())));
+      var district = districtRepository.findById(dto.getDistrictId())
+          .orElseThrow(() -> new NotFoundException("district_not_found",List.of(dto.getDistrictId().toString())));
+
         var stadium = mapper.toEntity(dto);
         stadium.setOwner(owner);
+        stadium.setRegion(region);
+        stadium.setDistrict(district);
         var saved =  stadiumRepository.save(stadium);
         var response = mapper.toDto(saved);
         response.setOwnerName(owner.getUsername());

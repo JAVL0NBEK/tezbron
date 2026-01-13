@@ -4,6 +4,8 @@ import com.example.bron.booking.BookingEntity;
 import com.example.bron.common.FileResponseDto;
 import com.example.bron.enums.StadiumDuration;
 import com.example.bron.enums.StadiumType;
+import com.example.bron.location.DistrictEntity;
+import com.example.bron.location.RegionEntity;
 import com.example.bron.match.MatchEntity;
 import com.example.bron.auth.user.UserEntity;
 import com.example.bron.stadium.dto.LocationDto;
@@ -32,6 +34,14 @@ public class StadiumEntity {
     private UserEntity owner;
 
     private String description;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "region_id", nullable = false)
+    private RegionEntity region;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "district_id", nullable = false)
+    private DistrictEntity district;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb", nullable = false)

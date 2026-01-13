@@ -15,4 +15,6 @@ public class StadiumRatingResponseDto {
   private Long userId;
   private Integer rating; // 1–5
   private String comment;
+  private String stadiumName;
+  private String userFullName;
 }

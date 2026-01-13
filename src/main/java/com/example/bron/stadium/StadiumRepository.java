@@ -1,9 +1,6 @@
 package com.example.bron.stadium;
 
-import com.example.bron.enums.StadiumDuration;
-import com.example.bron.enums.StadiumType;
 import com.example.bron.stadium.dto.StadiumResponseDto;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,9 +23,12 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.duration,
         s.capacity,
         s.pricePerHour,
-        s.isActive
+        s.isActive,
+        s.region.name,
+        s.district.name
     )
     from StadiumEntity s
+    
     where s.id in (
         select min(st.id) from StadiumEntity st group by st.owner.id
     )
@@ -60,7 +60,9 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.duration,
         s.capacity,
         s.pricePerHour,
-        s.isActive
+        s.isActive,
+        s.region.name,
+        s.district.name
     )
     from StadiumEntity s
     where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})

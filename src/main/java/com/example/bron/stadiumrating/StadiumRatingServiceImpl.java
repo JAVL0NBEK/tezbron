@@ -3,6 +3,7 @@ package com.example.bron.stadiumrating;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.stadium.StadiumRepository;
+import com.example.bron.stadiumrating.dto.RatingAvgAndCountResponseDto;
 import com.example.bron.stadiumrating.dto.StadiumRatingRequestDto;
 import com.example.bron.stadiumrating.dto.StadiumRatingResponseDto;
 import jakarta.transaction.Transactional;
@@ -48,5 +49,19 @@ public class StadiumRatingServiceImpl implements StadiumRatingService {
     saved.setStadium(stadium);
     saved.setUser(user);
     return stadiumRatingMapper.toDto(saved);
+  }
+
+  @Override
+  public RatingAvgAndCountResponseDto getRatings(Long stadiumId) {
+    var response = new RatingAvgAndCountResponseDto();
+    response.setAverageRating(stadiumRatingRepository.getAverageRating(stadiumId));
+    response.setRatingCount(stadiumRatingRepository.getRatingCount(stadiumId));
+    var ratings = stadiumRatingRepository.findAllByStadiumId(stadiumId);
+    response.setComments(
+        ratings.stream()
+            .map(stadiumRatingMapper::toDto)
+            .toList()
+    );
+    return response;
   }
 }
