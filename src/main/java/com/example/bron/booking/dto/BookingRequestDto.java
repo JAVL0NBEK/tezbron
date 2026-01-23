@@ -17,9 +17,7 @@ public class BookingRequestDto {
   private Long userId;
   private Long stadiumId;
   private Long matchId;
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
   private LocalDateTime startTime;
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
   private LocalDateTime endTime;
   private Double totalPrice;
   private BookingStatus status;

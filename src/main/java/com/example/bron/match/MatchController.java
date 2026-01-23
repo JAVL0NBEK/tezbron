@@ -1,6 +1,7 @@
 package com.example.bron.match;
 
 import com.example.bron.common.BaseResponse;
+import com.example.bron.match.dto.JoinMatchRequestDto;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
 import java.util.List;
@@ -22,6 +23,20 @@ public class MatchController implements MatchApi {
   }
 
   @Override
+  public ResponseEntity<BaseResponse<MatchResponseDto>> joinMatch(Long matchId,
+      JoinMatchRequestDto dto) {
+    var response = matchService.joinMatch(matchId, dto);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(BaseResponse.created(response));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> leaveMatch(Long matchId, Long userId) {
+    matchService.leaveMatch(matchId, userId);
+    return ResponseEntity.ok(BaseResponse.noContent("Success"));
+  }
+
+  @Override
   public ResponseEntity<BaseResponse<MatchResponseDto>> update(Long id, MatchRequestDto dto) {
     var response = matchService.update(id, dto);
     return ResponseEntity.ok(BaseResponse.ok(response));
@@ -34,8 +49,8 @@ public class MatchController implements MatchApi {
   }
 
   @Override
-  public ResponseEntity<BaseResponse<List<MatchResponseDto>>> getAll() {
-    var list = matchService.getAll();
+  public ResponseEntity<BaseResponse<List<MatchResponseDto>>> getAll(MatchFilterParams filterParams) {
+    var list = matchService.getAll(filterParams);
     return ResponseEntity.ok(BaseResponse.ok(list));
   }
 

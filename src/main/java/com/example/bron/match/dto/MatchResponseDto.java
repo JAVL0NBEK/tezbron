@@ -7,9 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class MatchResponseDto {
   private Long id;
   private String title;
@@ -21,7 +22,22 @@ public class MatchResponseDto {
   private Integer currentPlayers;
   private Double pricePerPlayer;
   private MatchStatus status;
-  private List<Long> participants;
-  private LocationDto location;
+  private Object location;
+
+  public MatchResponseDto(Long id, String title, Long organizerId, Long stadiumId,
+      LocalDateTime dateTime, Duration duration, Integer maxPlayers, Integer currentPlayers,
+      Double pricePerPlayer, MatchStatus status, Object location) {
+    this.id = id;
+    this.title = title;
+    this.organizerId = organizerId;
+    this.stadiumId = stadiumId;
+    this.dateTime = dateTime;
+    this.duration = duration;
+    this.maxPlayers = maxPlayers;
+    this.currentPlayers = currentPlayers;
+    this.pricePerPlayer = pricePerPlayer;
+    this.status = status;
+    this.location = location;
+  }
 
 }

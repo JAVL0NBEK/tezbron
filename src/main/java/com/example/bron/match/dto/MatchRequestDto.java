@@ -21,6 +21,5 @@ public class MatchRequestDto {
   private Integer currentPlayers;
   private Double pricePerPlayer;
   private MatchStatus status;
-  private List<Long> participants;
   private LocationDto location;
 }

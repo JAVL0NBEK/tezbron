@@ -1,10 +1,13 @@
 package com.example.bron.match;
 
+import com.example.bron.enums.ParticipantStatus;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.match.dto.JoinMatchRequestDto;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
 import com.example.bron.stadium.StadiumRepository;
 import com.example.bron.auth.user.UserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MatchServiceImpl implements MatchService{
   private final MatchRepository matchRepository;
+  private final MatchParticipantRepository matchParticipantRepository;
   private final UserRepository userRepository;
   private final StadiumRepository stadiumRepository;
   private final MatchMapper mapper;
@@ -47,11 +51,46 @@ public class MatchServiceImpl implements MatchService{
   }
 
   @Override
-  public List<MatchResponseDto> getAll() {
-    var list = matchRepository.findAll();
-    return list.stream()
-        .map(mapper::toDto)
-        .toList();
+  public List<MatchResponseDto> getAll(MatchFilterParams filterParams) {
+    return matchRepository.getAll(filterParams);
+  }
+
+  @Override
+  public MatchResponseDto joinMatch(Long matchId, JoinMatchRequestDto dto) {
+    var match = matchRepository.findById(matchId).orElseThrow(() ->
+        new NotFoundException("match_not_found",List.of(matchId.toString())));
+    var participant = userRepository.findById(dto.userId()).orElseThrow(
+        () -> new NotFoundException("participant_not_found",List.of(dto.userId().toString())));
+    if (matchParticipantRepository.countByMatchId(matchId) >= match.getMaxPlayers()) {
+      throw new NotFoundException("match_is_full",List.of(matchId.toString()));
+    }
+
+    if (matchParticipantRepository.existsByMatchIdAndUserId(matchId,dto.userId())) {
+      throw new NotFoundException("match_is_full",List.of(matchId.toString()));
+    }
+
+    var matchParticipant = new MatchParticipantEntity();
+    matchParticipant.setMatch(match);
+    matchParticipant.setUser(participant);
+    matchParticipant.setJoinedAt(LocalDateTime.now());
+    matchParticipant.setStatus(ParticipantStatus.REQUESTED);
+    matchParticipantRepository.save(matchParticipant);
+    return mapper.toDto(match);
+  }
+
+  @Override
+  public void leaveMatch(Long matchId, Long userId) {
+    var match = matchRepository.findById(matchId).orElseThrow(() ->
+        new NotFoundException("match_not_found",List.of(matchId.toString())));
+
+    var matchParticipant =  matchParticipantRepository.findByMatchIdAndUserId(matchId,userId)
+        .orElseThrow(() -> new NotFoundException("participant_not_in_match",List.of(matchId.toString())));
+
+    if (!match.getOrganizer().getId().equals(userId)) {
+      throw new NotFoundException("organizer_cannot_leave_leave",List.of(userId.toString()));
+    }
+
+    matchParticipantRepository.delete(matchParticipant);
   }
 
   private MatchEntity getFindById(Long id) {

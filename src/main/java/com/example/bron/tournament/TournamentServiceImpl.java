@@ -17,10 +17,10 @@ public class TournamentServiceImpl implements TournamentService {
 
   @Override
   public TournamentResponseDto create(TournamentRequestDto dto) {
-    var tournamentEntity = mapper.toEntity(dto);
     var organizer = userRepository.findById(dto.getOrganizerId()).orElseThrow(
         () -> new NotFoundException("tournament_organizer_id_not_found",List.of(dto.getOrganizerId().toString()))
     );
+    var tournamentEntity = mapper.toEntity(dto);
     tournamentEntity.setOrganizer(organizer);
     var savedTournament = tournamentRepository.save(tournamentEntity);
     return mapper.toDto(savedTournament);

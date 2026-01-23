@@ -2,6 +2,7 @@ package com.example.bron.team;
 
 import com.example.bron.auth.user.UserEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,15 +26,17 @@ public class TeamEntity {
     private UserEntity captain;
 
     @Column(nullable = false)
+    private Long maxMembers;
+
+    @Column(nullable = false)
     private String sportType;
 
-    @ElementCollection
-    @CollectionTable(
-      name = "team_members",
-      joinColumns = @JoinColumn(name = "team_id")
+    @OneToMany(
+      mappedBy = "team",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
     )
-    @Column(name = "member_id")
-    private List<Long> memberIds;
+    private List<TeamMemberEntity> members;
 
     private String description;
 

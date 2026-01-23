@@ -23,46 +23,12 @@ public interface MatchMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "stadium", ignore = true)
   @Mapping(target = "organizer", ignore = true)
-  @Mapping(target = "location", source = "location", qualifiedByName = "toJson")
   MatchEntity toEntity(MatchRequestDto dto);
 
 
-  @Mapping(target = "location", source = "location", qualifiedByName = "fromJson")
   MatchResponseDto toDto(MatchEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  @Mapping(target = "location", source = "location", qualifiedByName = "toJson")
   void updateEntity(@MappingTarget MatchEntity entity, MatchRequestDto dto);
 
-  // ========== HELPERS FOR JSON <-> DTO ==========
-
-  @Named("toJson")
-  default String toJson(Object value) {
-    try {
-      return value != null ? mapper.writeValueAsString(value) : null;
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Named("fromJson")
-  default LocationDto fromJson(String json) {
-    try {
-      return json != null ? mapper.readValue(json, LocationDto.class) : null;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Named("fromJsonList")
-  default List<AvailabilitySlotRequestDto> fromJsonList(String json) {
-    try {
-      return json != null ? mapper.readValue(
-          json,
-          mapper.getTypeFactory().constructCollectionType(List.class, AvailabilitySlotRequestDto.class)
-      ) : null;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
 }

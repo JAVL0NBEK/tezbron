@@ -12,6 +12,7 @@ public interface TournamentMapper {
   @Mapping(target = "organizer", ignore = true)
   TournamentEntity toEntity(TournamentRequestDto dto);
 
+  @Mapping(source = "organizer.id", target = "organizerId")
   TournamentResponseDto toDto(TournamentEntity entity);
 
 }

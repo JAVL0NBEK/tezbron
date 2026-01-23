@@ -4,6 +4,7 @@ import com.example.bron.enums.Duration;
 import com.example.bron.enums.MatchStatus;
 import com.example.bron.stadium.StadiumEntity;
 import com.example.bron.auth.user.UserEntity;
+import com.example.bron.stadium.dto.LocationDto;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -36,9 +37,9 @@ public class MatchEntity {
     @Column(nullable = false)
     private LocalDateTime dateTime;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Duration duration;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Duration duration;
 
     private Integer maxPlayers;
     private Integer currentPlayers;
@@ -47,12 +48,11 @@ public class MatchEntity {
     @Enumerated(EnumType.STRING)
     private MatchStatus status;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "participants")
-    private List<Long> participants;
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MatchParticipantEntity> participants;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
-    private String location;
+    private LocationDto location;
 
 }

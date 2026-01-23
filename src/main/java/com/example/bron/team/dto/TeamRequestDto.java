@@ -20,7 +20,7 @@ public class TeamRequestDto {
 
   private StadiumType sportType;
 
-  private List<Long> memberIds;
+  private Long maxMembers;
 
   private String description;
 
