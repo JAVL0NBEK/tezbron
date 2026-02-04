@@ -16,7 +16,7 @@ public class CoachServiceImpl implements CoachService {
   private final UserRepository userRepository;
 
   @Override
-  public CoachResponseDto createStadium(CoachRequestDto dto) {
+  public CoachResponseDto createCoach(CoachRequestDto dto) {
     var user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
         new NotFoundException("stadium_user_not_fount",List.of(dto.getUserId().toString())));
     var coach = mapper.toEntity(dto);
@@ -26,7 +26,7 @@ public class CoachServiceImpl implements CoachService {
   }
 
   @Override
-  public CoachResponseDto updateStadium(Long id, CoachRequestDto dto) {
+  public CoachResponseDto updateCoach(Long id, CoachRequestDto dto) {
     var entity = getById(id);
     mapper.updateEntity(entity,dto);
     var saved = coachRepository.save(entity);
@@ -34,12 +34,12 @@ public class CoachServiceImpl implements CoachService {
   }
 
   @Override
-  public CoachResponseDto getStadiumById(Long id) {
+  public CoachResponseDto getCoachById(Long id) {
     return mapper.toDto(getById(id));
   }
 
   @Override
-  public List<CoachResponseDto> getAllStadium() {
+  public List<CoachResponseDto> getAllCoach() {
     var coaches = coachRepository.findAll();
     return coaches.stream()
         .map(mapper::toDto)
@@ -47,6 +47,6 @@ public class CoachServiceImpl implements CoachService {
   }
 
   private CoachEntity getById(Long id) {
-    return coachRepository.findById(id).orElseThrow(() -> new NotFoundException("stadium_coach_not_found",List.of(id.toString())));
+    return coachRepository.findById(id).orElseThrow(() -> new NotFoundException("coach_not_found",List.of(id.toString())));
   }
 }

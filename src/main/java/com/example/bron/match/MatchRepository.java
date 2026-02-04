@@ -22,9 +22,8 @@ public interface MatchRepository extends JpaRepository<MatchEntity,Long> {
   match.status,
   match.location
   ) from MatchEntity match
-  where
-  (:#{#filterParams.startDateFromIsNull} = TRUE OR cast(match.dateTime as date) >= cast(:#{#filterParams.startDateFrom} as date))
-  AND (:#{#filterParams.startDateToIsNull} = TRUE OR cast(match.dateTime as date) <= cast(:#{#filterParams.startDateTo} as date))
+  where (:#{#filterParams.startDateFromIsNull} = TRUE OR cast(match.dateTime as date) >= :#{#filterParams.startDateFrom})
+  AND (:#{#filterParams.startDateToIsNull} = TRUE OR cast(match.dateTime as date) <= :#{#filterParams.startDateTo})
   and (:#{#filterParams.regionId} is null or match.stadium.region.id = :#{#filterParams.regionId})
   and (:#{#filterParams.districtId} is null or match.stadium.district.id = :#{#filterParams.districtId})
 """)

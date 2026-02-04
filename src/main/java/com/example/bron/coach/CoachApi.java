@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface CoachApi {
 
   @PostMapping("/create")
-  ResponseEntity<BaseResponse<CoachResponseDto>> createStadium(CoachRequestDto dto);
+  ResponseEntity<BaseResponse<CoachResponseDto>> createCoach(CoachRequestDto dto);
 
   @PutMapping("/{id}")
-  ResponseEntity<BaseResponse<CoachResponseDto>> updateStadium(@PathVariable Long id, CoachRequestDto dto);
+  ResponseEntity<BaseResponse<CoachResponseDto>> updateCoach(@PathVariable Long id, CoachRequestDto dto);
 
   @GetMapping("/{id}")
-  ResponseEntity<BaseResponse<CoachResponseDto>> getStadiumById(@PathVariable Long id);
+  ResponseEntity<BaseResponse<CoachResponseDto>> getCoachById(@PathVariable Long id);
 
   @GetMapping
-  ResponseEntity<BaseResponse<List<CoachResponseDto>>> getStadiums();
+  ResponseEntity<BaseResponse<List<CoachResponseDto>>> getCoach();
 
 }

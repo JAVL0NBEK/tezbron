@@ -1,5 +1,7 @@
 package com.example.bron.auth.user;
 
+import com.example.bron.auth.user.dto.AssignRoleRequestDto;
+import com.example.bron.auth.user.role.dto.RoleResponseDto;
 import com.example.bron.common.BaseResponse;
 import com.example.bron.auth.user.dto.UserDTO;
 import com.example.bron.auth.user.dto.UserRequestDto;
@@ -45,5 +47,25 @@ public class UserController implements UserApi {
     userService.delete(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .body(BaseResponse.noContent("User deleted successfully"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> assignRoles(Long userId, AssignRoleRequestDto dto) {
+    userService.assignRoles(userId, dto);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(BaseResponse.noContent("User assign roles successfully"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> removeRole(Long userId, Long roleId) {
+    userService.removeRole(userId, roleId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(BaseResponse.noContent("User remove roles successfully"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<List<RoleResponseDto>>> getRoles(Long userId) {
+    var  userRoles = userService.getRoles(userId);
+    return ResponseEntity.ok(BaseResponse.ok(userRoles));
   }
 }

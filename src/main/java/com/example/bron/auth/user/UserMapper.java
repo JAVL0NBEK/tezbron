@@ -1,5 +1,6 @@
 package com.example.bron.auth.user;
 
+import com.example.bron.auth.dto.LoginResponseDto;
 import com.example.bron.stadium.dto.LocationDto;
 import com.example.bron.auth.user.dto.UserDTO;
 import com.example.bron.auth.user.dto.UserRequestDto;
@@ -23,8 +24,12 @@ public interface UserMapper {
   @Mapping(target = "location", source = "location", qualifiedByName = "toJson")
   UserEntity toEntity(UserRequestDto dto);
 
-  @Mapping(target = "location", source = "location", qualifiedByName = "fromJson")
+//  @Mapping(target = "location", source = "location", qualifiedByName = "fromJson")
+//  @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet()))")
+//  @Mapping(target = "permissions", expression = "java(user.getRoles().stream().flatMap(r -> r.getPermissions().stream()).map(p -> p.getName()).collect(Collectors.toSet()))")
   UserDTO toDto(UserEntity entity);
+
+  LoginResponseDto toLoginDto(UserEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "id", ignore = true)

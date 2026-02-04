@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/v1")
+@RequestMapping("/api/auth")
 @Tag(name = "Auth API ")
 public interface AuthApi {
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     @Operation(summary = "REST request to user login")
     ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest);
 }

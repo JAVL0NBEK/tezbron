@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequestDto {
   private String username;
-  private String passwordHash;
-  private Role role;
+  private String password; // so‘ngra BCrypt bilan hash qilamiz
   private String phone;
-  private LocationDto location;
+  private String fullName;
+  private String profileImageUrl;
+  private String location; // json string sifatida
+  private Long districtId;
 }

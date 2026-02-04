@@ -1,11 +1,14 @@
 package com.example.bron.auth.user;
 
+import com.example.bron.auth.user.role.RoleEntity;
 import com.example.bron.booking.BookingEntity;
-import com.example.bron.enums.Role;
+import com.example.bron.location.DistrictEntity;
 import com.example.bron.team.TeamEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,9 +33,19 @@ public class UserEntity {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id")
+    private DistrictEntity district;
+
+    // Userda bir nechta role bo‘lishi mumkin
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+
+    private Set<RoleEntity> roles = new HashSet<>();
 
     private String phone;
     private String fullName;

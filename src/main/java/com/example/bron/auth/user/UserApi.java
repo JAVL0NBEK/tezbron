@@ -1,11 +1,15 @@
 package com.example.bron.auth.user;
 
+import com.example.bron.auth.user.dto.AssignRoleRequestDto;
+import com.example.bron.auth.user.role.dto.RoleResponseDto;
 import com.example.bron.common.BaseResponse;
 import com.example.bron.auth.user.dto.UserDTO;
 import com.example.bron.auth.user.dto.UserRequestDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,5 +36,18 @@ public interface UserApi {
   @DeleteMapping("/{id}")
   ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);
 
+  @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('DISTRICT_ADMIN')")
+  @PostMapping("/{userId}/roles")
+  ResponseEntity<BaseResponse<Void>> assignRoles(@PathVariable Long userId,
+      @RequestBody @Valid AssignRoleRequestDto dto);
+
+  @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('DISTRICT_ADMIN')")
+  @DeleteMapping("/{userId}/roles/{roleId}")
+  ResponseEntity<BaseResponse<Void>> removeRole(@PathVariable Long userId,
+      @PathVariable Long roleId);
+
+  @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('DISTRICT_ADMIN')")
+  @GetMapping("/{userId}/roles")
+  ResponseEntity<BaseResponse<List<RoleResponseDto>>> getRoles(@PathVariable Long userId);
 
 }

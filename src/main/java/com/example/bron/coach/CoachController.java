@@ -15,28 +15,28 @@ public class CoachController implements CoachApi {
   private final CoachService service;
 
   @Override
-  public ResponseEntity<BaseResponse<CoachResponseDto>> createStadium(CoachRequestDto dto) {
-    var coach = service.createStadium(dto);
+  public ResponseEntity<BaseResponse<CoachResponseDto>> createCoach(CoachRequestDto dto) {
+    var coach = service.createCoach(dto);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(BaseResponse.created(coach));
   }
 
   @Override
-  public ResponseEntity<BaseResponse<CoachResponseDto>> updateStadium(Long id,
+  public ResponseEntity<BaseResponse<CoachResponseDto>> updateCoach(Long id,
       CoachRequestDto dto) {
-    var coach = service.updateStadium(id, dto);
+    var coach = service.updateCoach(id, dto);
     return ResponseEntity.ok(BaseResponse.ok(coach));
   }
 
   @Override
-  public ResponseEntity<BaseResponse<CoachResponseDto>> getStadiumById(Long id) {
-    var coach = service.getStadiumById(id);
+  public ResponseEntity<BaseResponse<CoachResponseDto>> getCoachById(Long id) {
+    var coach = service.getCoachById(id);
     return ResponseEntity.ok(BaseResponse.ok(coach));
   }
 
   @Override
-  public ResponseEntity<BaseResponse<List<CoachResponseDto>>> getStadiums() {
-    var coaches = service.getAllStadium();
+  public ResponseEntity<BaseResponse<List<CoachResponseDto>>> getCoach() {
+    var coaches = service.getAllCoach();
     return ResponseEntity.ok(BaseResponse.ok(coaches));
   }
 }
