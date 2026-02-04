@@ -1,53 +1,53 @@
 package com.example.bron.exception;
 
+import com.example.bron.common.BaseResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 🟢 Custom exception (masalan, ResourceNotFoundException)
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-    }
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<BaseResponse<Void>> handleNotFound(NotFoundException ex) {
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(BaseResponse.error(ex.getMessage()));
+  }
 
-    // 🟠 Illegal argument / validation xatolari
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadRequest(IllegalArgumentException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<BaseResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
+    String message = ex.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .map(error -> error.getField() + ": " + error.getDefaultMessage())
+        .collect(Collectors.joining(", "));
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(BaseResponse.error(message));
+  }
 
-    // 🔴 Barcha qolgan xatolar uchun (general)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGeneral(Exception ex) {
-        String message = ex.getMessage() != null ? ex.getMessage() : "internal_server_error";
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<BaseResponse<Void>> handleConstraint(ConstraintViolationException ex) {
+    String message = ex.getConstraintViolations()
+        .stream()
+        .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+        .collect(Collectors.joining(", "));
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(BaseResponse.error(message));
+  }
 
-        // ⚠️ Swagger API (springdoc-openapi) xatolarini tutmaslik
-        if (isSwaggerError(ex)) {
-            // Swagger uchun hech narsa qaytarmaymiz – u o‘zi handle qiladi
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        ex.printStackTrace(); // log uchun
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
-    }
-
-    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message) {
-        ApiErrorResponse response = new ApiErrorResponse(status.value(), message);
-        return ResponseEntity.status(status).body(response);
-    }
-
-    // Swagger uchun istisno qilinadigan joylar
-    private boolean isSwaggerError(Exception ex) {
-        String trace = ex.toString().toLowerCase();
-        return trace.contains("springdoc")
-                || trace.contains("swagger")
-                || trace.contains("openapi");
-    }
-
-    // JSON javob formati
-    public record ApiErrorResponse(int status, String message) {}
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<BaseResponse<Void>> handleAll(Exception ex) {
+    ex.printStackTrace(); // loglash uchun
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(BaseResponse.error("Unexpected error: " + ex.getMessage()));
+  }
 }

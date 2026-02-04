@@ -9,11 +9,14 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATA_REDIS_HOST=redis          # ✅ Redis host nomi (docker ichida)
+      - SPRING_DATA_REDIS_PORT=6379           # ✅ Redis porti
       - TZ=Asia/Tashkent
     ports:
       - "5002:8080"
     depends_on:
       - dbbron
+      - redis                                 # ✅ Redis’ga bog‘liqlik
     restart: always
     networks:
       - log
@@ -34,8 +37,21 @@ services:
     networks:
       - log
 
+  redis:                                      # ✅ Yangi Redis servisi
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data                      # ✅ Ma’lumotlarni saqlab turish
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: always
+    networks:
+      - log
+
 volumes:
   pgdata1:
+  redis_data:                                 # ✅ Redis volume
 
 networks:
   log:

@@ -1,11 +1,10 @@
 package com.example.bron.team;
 
-import com.example.bron.user.UserEntity;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+import com.example.bron.auth.user.UserEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,11 +26,17 @@ public class TeamEntity {
     private UserEntity captain;
 
     @Column(nullable = false)
+    private Long maxMembers;
+
+    @Column(nullable = false)
     private String sportType;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "members")
-    private List<Long> members;
+    @OneToMany(
+      mappedBy = "team",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+    )
+    private List<TeamMemberEntity> members;
 
     private String description;
 

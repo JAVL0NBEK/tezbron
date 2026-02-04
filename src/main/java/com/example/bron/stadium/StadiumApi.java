@@ -1,8 +1,14 @@
 package com.example.bron.stadium;
 
+import com.example.bron.common.BaseResponse;
+import com.example.bron.enums.StadiumDuration;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,18 +18,23 @@ import java.util.List;
 @Tag(name = "Stadium Management APIs", description = "Endpoints for managing stadiums")
 public interface StadiumApi {
 
-    @PostMapping("/create")
-    ResponseEntity<StadiumResponseDto> create(@RequestBody StadiumRequestDto stadiumRequestDto);
+  @PostMapping("/create")
+  ResponseEntity<BaseResponse<StadiumResponseDto>> create(@RequestBody StadiumRequestDto stadiumRequestDto);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<StadiumResponseDto> update(@PathVariable Long id, @RequestBody StadiumRequestDto dto);
+  @PutMapping("/{id}")
+  ResponseEntity<BaseResponse<StadiumResponseDto>> update(@PathVariable Long id,
+      @RequestBody StadiumRequestDto dto);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StadiumResponseDto> getById(@PathVariable Long id);
+  @GetMapping("/{id}")
+  ResponseEntity<BaseResponse<List<StadiumResponseDto>>> getById(
+      @PathVariable Long id,
+      @RequestParam("date") LocalDate date,
+      @RequestParam("duration") StadiumDuration duration
+  );
 
-    @GetMapping
-    public ResponseEntity<List<StadiumResponseDto>> getAll();
+  @GetMapping
+  ResponseEntity<BaseResponse<Page<StadiumResponseDto>>> getAll(StadiumFilterParams filterParams, Pageable pageable);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id);
+  @DeleteMapping("/{id}")
+  ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);
 }
