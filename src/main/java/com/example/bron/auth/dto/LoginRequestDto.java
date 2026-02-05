@@ -1,9 +1,12 @@
 package com.example.bron.auth.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequestDto {
-    private String username;
-    private String password;
+  @NotBlank
+  private String phoneNumber;
+  @NotBlank
+  private String otpCode;
 }

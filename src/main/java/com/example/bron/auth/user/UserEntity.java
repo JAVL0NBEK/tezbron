@@ -47,6 +47,7 @@ public class UserEntity {
 
     private Set<RoleEntity> roles = new HashSet<>();
 
+    @Column(unique = true, nullable = false)
     private String phone;
     private String fullName;
     private String profileImageUrl;
