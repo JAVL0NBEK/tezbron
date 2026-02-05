@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     where u.username = :username
 """)
   Optional<UserEntity> findByUsernameWithRolesAndPermissions(String username);
+  Optional<UserEntity> findByPhone(String phone);
 
   Optional<UserEntity> findByUsername(String username);
 }

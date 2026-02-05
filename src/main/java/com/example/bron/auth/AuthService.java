@@ -5,4 +5,5 @@ import com.example.bron.auth.dto.LoginResponseDto;
 
 public interface AuthService {
     LoginResponseDto login(LoginRequestDto loginRequest);
+    void sendOtp(String phoneNumber);
 }
