@@ -14,7 +14,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   private final UserRepository userRepository;
 
   public UserDetails loadUserByUsername(String usernameOrPhone) {
-    var user = userRepository.findByUsername(usernameOrPhone)
+    var user = userRepository.findByUsernameWithRolesAndPermissions(usernameOrPhone)
         .or(() -> userRepository.findByPhone(usernameOrPhone))
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
