@@ -2,6 +2,7 @@ package com.example.bron.match.dto;
 
 import com.example.bron.enums.Duration;
 import com.example.bron.enums.MatchStatus;
+import com.example.bron.enums.SportType;
 import com.example.bron.stadium.dto.LocationDto;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,10 +24,11 @@ public class MatchResponseDto {
   private Double pricePerPlayer;
   private MatchStatus status;
   private Object location;
+  private SportType sportType;
 
   public MatchResponseDto(Long id, String title, Long organizerId, Long stadiumId,
       LocalDateTime dateTime, Duration duration, Integer maxPlayers, Integer currentPlayers,
-      Double pricePerPlayer, MatchStatus status, Object location) {
+      Double pricePerPlayer, MatchStatus status, Object location, SportType sportType) {
     this.id = id;
     this.title = title;
     this.organizerId = organizerId;
@@ -38,6 +40,7 @@ public class MatchResponseDto {
     this.pricePerPlayer = pricePerPlayer;
     this.status = status;
     this.location = location;
+    this.sportType = sportType;
   }
 
 }

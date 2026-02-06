@@ -20,12 +20,14 @@ public interface MatchRepository extends JpaRepository<MatchEntity,Long> {
   match.currentPlayers,
   match.pricePerPlayer,
   match.status,
-  match.location
+  match.location,
+  match.sportType
   ) from MatchEntity match
   where (:#{#filterParams.startDateFromIsNull} = TRUE OR cast(match.dateTime as date) >= :#{#filterParams.startDateFrom})
   AND (:#{#filterParams.startDateToIsNull} = TRUE OR cast(match.dateTime as date) <= :#{#filterParams.startDateTo})
   and (:#{#filterParams.regionId} is null or match.stadium.region.id = :#{#filterParams.regionId})
   and (:#{#filterParams.districtId} is null or match.stadium.district.id = :#{#filterParams.districtId})
+  and (:#{#filterParams.sportTypeIsNull} = TRUE or match.sportType = :#{#filterParams.sportType})
 """)
   List<MatchResponseDto> getAll(MatchFilterParams filterParams);
 

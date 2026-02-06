@@ -1,5 +1,6 @@
 package com.example.bron.match;
 
+import com.example.bron.enums.SportType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,8 @@ public class MatchFilterParams {
   @DateTimeFormat(iso = ISO.DATE)
   private LocalDate startDateTo;
 
+  private SportType sportType;
+
   @Schema(hidden = true)
   public Boolean getStartDateToIsNull() {
     return this.startDateTo == null;
@@ -30,5 +33,10 @@ public class MatchFilterParams {
   @Schema(hidden = true)
   public Boolean getStartDateFromIsNull() {
     return this.startDateFrom == null;
+  }
+
+  @Schema(hidden = true)
+  public Boolean getSportTypeIsNull() {
+    return this.sportType == null;
   }
 }
