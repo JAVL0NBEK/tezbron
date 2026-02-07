@@ -1,14 +1,9 @@
 package com.example.bron.tournament.dto;
 
-import com.example.bron.auth.user.UserEntity;
+import com.example.bron.enums.SportType;
 import com.example.bron.enums.TournamentStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,13 +23,19 @@ public class TournamentResponseDto {
   private LocalDate startDate;
   private LocalDate endDate;
 
-  private String sportType;
+  private SportType sportType;
 
   private Integer maxTeams;
+  private Integer teamApplied;
   private Double entryFee;
 
   private String rules;
 
   private TournamentStatus status;
+  private LocalTime startTime;
+  private LocalTime endTime;
+  private Object location;
+  private String address;
+  private String prizes;
 
 }
