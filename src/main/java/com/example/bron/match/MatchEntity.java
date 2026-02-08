@@ -43,7 +43,7 @@ public class MatchEntity {
     private Duration duration;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private SportType sportType;
 
     private Integer maxPlayers;

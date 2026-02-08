@@ -66,7 +66,7 @@ public class MatchServiceImpl implements MatchService{
     }
 
     if (matchParticipantRepository.existsByMatchIdAndUserId(matchId,dto.userId())) {
-      throw new NotFoundException("match_is_full",List.of(matchId.toString()));
+      throw new NotFoundException("match_is_user_already_exist",List.of(matchId.toString()));
     }
 
     var matchParticipant = new MatchParticipantEntity();
