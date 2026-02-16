@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CoachResponseDto {
   private Long id;
-  private UserEntity user;
+  private String coachName;
   private String specialty;
   private Integer experienceYears;
   private Double hourlyRate;

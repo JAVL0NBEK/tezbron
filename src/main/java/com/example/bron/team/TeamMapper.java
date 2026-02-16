@@ -13,13 +13,11 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface TeamMapper {
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "captain", ignore = true)
   TeamEntity toEntity(TeamRequestDto dto);
 
   TeamResponseDto toDto(TeamEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  @Mapping(target = "captain", ignore = true)
   void updateEntity(@MappingTarget TeamEntity entity, TeamRequestDto dto);
 
 }

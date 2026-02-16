@@ -21,10 +21,7 @@ public class TeamServiceImpl implements TeamService {
   private final TeamMapper teamMapper;
   @Override
   public TeamResponseDto createTeam(TeamRequestDto dto) {
-    var user = userRepository.findById(dto.getCaptainId()).orElseThrow(() ->
-        new NotFoundException("user_not_found",List.of(dto.getCaptainId().toString())));
     var entity = teamMapper.toEntity(dto);
-    entity.setCaptain(user);
     var saved = teamRepository.save(entity);
     return teamMapper.toDto(saved);
   }
@@ -71,7 +68,6 @@ public class TeamServiceImpl implements TeamService {
     teamMemberRepository.delete(member);
 
   }
-
 
   @Override
   public TeamResponseDto getTeamById(Long id) {

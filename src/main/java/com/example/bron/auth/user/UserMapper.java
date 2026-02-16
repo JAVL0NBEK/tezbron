@@ -20,7 +20,6 @@ public interface UserMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "bookings", ignore = true)
-  @Mapping(target = "teams", ignore = true)
   @Mapping(target = "location", source = "location", qualifiedByName = "toJson")
   UserEntity toEntity(UserRequestDto dto);
 
@@ -34,7 +33,6 @@ public interface UserMapper {
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "bookings", ignore = true)
-  @Mapping(target = "teams", ignore = true)
   @Mapping(target = "location", source = "location", qualifiedByName = "toJson")
   void updateEntity(@MappingTarget UserEntity entity, UserRequestDto dto);
 

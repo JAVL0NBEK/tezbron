@@ -62,9 +62,4 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<BookingEntity> bookings;
-
-    @OneToMany(mappedBy = "captain")
-    @JsonIgnore
-    private List<TeamEntity> teams;
-
 }

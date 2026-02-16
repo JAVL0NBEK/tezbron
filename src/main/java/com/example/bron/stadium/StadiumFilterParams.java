@@ -19,6 +19,8 @@ public class StadiumFilterParams {
   private Integer capacity;
   private Double pricePerHour;
   private Boolean isActive;
+  private Long regionId;
+  private Long districtId;
 
   @Schema(hidden = true)
   public Boolean getStadiumTypeIsNull() {

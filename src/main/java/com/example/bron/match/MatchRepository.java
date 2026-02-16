@@ -17,7 +17,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity,Long> {
   match.dateTime,
   match.duration,
   match.maxPlayers,
-  match.currentPlayers,
+  SIZE(match.participants),
   match.pricePerPlayer,
   match.status,
   match.location,
