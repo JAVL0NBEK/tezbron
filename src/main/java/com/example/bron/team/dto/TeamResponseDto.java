@@ -1,6 +1,6 @@
 package com.example.bron.team.dto;
 
-import com.example.bron.enums.StadiumType;
+import com.example.bron.enums.SportType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,9 +17,7 @@ public class TeamResponseDto {
 
   private String name;
 
-  private Long captainId;
-
-  private StadiumType sportType;
+  private SportType sportType;
 
   private List<Long> memberIds;
 

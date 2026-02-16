@@ -33,6 +33,8 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         select min(st.id) from StadiumEntity st group by st.owner.id
     )
     and (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})
+    and (:#{#filterParams.regionId} is null or s.region.id = :#{#filterParams.regionId})
+    and (:#{#filterParams.districtId} is null or s.district.id = :#{#filterParams.districtId})
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.name} is null or s.name ilike %:#{#filterParams.name}%)
     and (:#{#filterParams.ownerName} is null or s.owner.fullName ilike %:#{#filterParams.ownerName}%)
@@ -66,6 +68,8 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     )
     from StadiumEntity s
     where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})
+    and (:#{#filterParams.regionId} is null or s.region.id = :#{#filterParams.regionId})
+    and (:#{#filterParams.districtId} is null or s.district.id = :#{#filterParams.districtId})
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.name} is null or s.name ilike %:#{#filterParams.name}%)
     and (:#{#filterParams.ownerName} is null or s.owner.fullName ilike %:#{#filterParams.ownerName}%)

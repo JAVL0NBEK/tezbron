@@ -1,8 +1,7 @@
 package com.example.bron.team;
 
-import com.example.bron.auth.user.UserEntity;
+import com.example.bron.enums.SportType;
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,15 +20,12 @@ public class TeamEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "captain_id")
-    private UserEntity captain;
-
     @Column(nullable = false)
     private Long maxMembers;
 
     @Column(nullable = false)
-    private String sportType;
+    @Enumerated(EnumType.STRING)
+    private SportType sportType;
 
     @OneToMany(
       mappedBy = "team",

@@ -15,7 +15,7 @@ public interface CoachMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "user", ignore = true)
   CoachEntity toEntity(CoachRequestDto dto);
-
+  @Mapping(target = "coachName", source = "user.username")
   CoachResponseDto toDto(CoachEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
