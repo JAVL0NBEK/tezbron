@@ -51,4 +51,11 @@ public class StadiumController implements StadiumApi {
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .body(BaseResponse.noContent("Stadium deleted successfully"));
   }
+
+  @Override
+  public ResponseEntity<BaseResponse<StadiumResponseDto>> updateFavorite(Long id,
+      Boolean isFavorite) {
+    var response = stadiumService.updateFavorite(id, isFavorite);
+    return ResponseEntity.ok(BaseResponse.ok(response));
+  }
 }

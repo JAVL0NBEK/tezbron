@@ -98,6 +98,13 @@ public class StadiumServiceImpl implements StadiumService {
           pageable);
     }
 
+  @Override
+  public StadiumResponseDto updateFavorite(Long id, Boolean isFavorite) {
+      var stadion = getFindById(id);
+      stadion.setIsFavorite(isFavorite);
+    return mapper.toDto(stadiumRepository.save(stadion));
+  }
+
   private StadiumResponseDto buildStadiumResponseWithSlots(StadiumResponseDto stadium,
       LocalDate date,
       StadiumDuration duration) {

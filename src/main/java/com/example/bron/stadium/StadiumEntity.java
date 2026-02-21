@@ -71,4 +71,6 @@ public class StadiumEntity {
     @OneToMany(mappedBy = "stadium")
     private List<MatchEntity> matches;
 
+    private Boolean isFavorite;
+
 }

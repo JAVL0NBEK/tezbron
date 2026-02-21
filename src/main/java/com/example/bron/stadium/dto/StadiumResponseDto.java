@@ -26,12 +26,13 @@ public class StadiumResponseDto {
     private Boolean isActive;
     private String districtName;
     private String regionName;
+    private Boolean isFavorite;
 
 
   public StadiumResponseDto(Long id, String name, Long ownerId, String ownerName,
       String description,
       Object location, StadiumType type, StadiumDuration duration, Integer capacity,
-      Double pricePerHour, Boolean isActive, String districtName, String regionName) {
+      Double pricePerHour, Boolean isActive, String districtName, String regionName, Boolean isFavorite) {
     this.id = id;
     this.name = name;
     this.ownerId = ownerId;
@@ -45,6 +46,7 @@ public class StadiumResponseDto {
     this.isActive = isActive;
     this.districtName = districtName;
     this.regionName = regionName;
+    this.isFavorite = isFavorite;
   }
 
   private List<LocalDateTime> slots;

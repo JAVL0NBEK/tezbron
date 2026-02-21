@@ -25,7 +25,8 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.pricePerHour,
         s.isActive,
         s.region.name,
-        s.district.name
+        s.district.name,
+        s.isFavorite
     )
     from StadiumEntity s
     
@@ -42,6 +43,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.pricePerHour} is null or s.pricePerHour = :#{#filterParams.pricePerHour})
     and (:#{#filterParams.isActive} is null or s.isActive = :#{#filterParams.isActive})
+    and (:#{#filterParams.isFavorite} is null or s.isFavorite = :#{#filterParams.isFavorite})
     and (:#{#filterParams.description} is null or s.description ilike %:#{#filterParams.description}%)
     and (:#{#filterParams.stadiumTypeIsNull} = TRUE or s.type = :#{#filterParams.type})
     and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})
@@ -64,7 +66,8 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.pricePerHour,
         s.isActive,
         s.region.name,
-        s.district.name
+        s.district.name,
+        s.isFavorite
     )
     from StadiumEntity s
     where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})
@@ -77,6 +80,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.pricePerHour} is null or s.pricePerHour = :#{#filterParams.pricePerHour})
     and (:#{#filterParams.isActive} is null or s.isActive = :#{#filterParams.isActive})
+    and (:#{#filterParams.isFavorite} is null or s.isFavorite = :#{#filterParams.isFavorite})
     and (:#{#filterParams.description} is null or s.description ilike %:#{#filterParams.description}%)
     and (:#{#filterParams.stadiumTypeIsNull} = TRUE or s.type = :#{#filterParams.type})
     and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})

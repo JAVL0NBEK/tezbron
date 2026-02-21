@@ -37,4 +37,8 @@ public interface StadiumApi {
 
   @DeleteMapping("/{id}")
   ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);
+
+  @PutMapping("/{id}/{isFavorite}")
+  ResponseEntity<BaseResponse<StadiumResponseDto>> updateFavorite(@PathVariable Long id,
+      @PathVariable Boolean isFavorite);
 }

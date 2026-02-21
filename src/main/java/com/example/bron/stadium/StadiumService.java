@@ -16,4 +16,5 @@ public interface StadiumService {
     void delete(Long id);
     List<StadiumResponseDto> getById(Long id, LocalDate date, StadiumDuration duration);
     Page<StadiumResponseDto> getAll(StadiumFilterParams filterParams, Pageable pageable);
+    StadiumResponseDto updateFavorite(Long id, Boolean isFavorite);
 }

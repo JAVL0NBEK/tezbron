@@ -47,7 +47,9 @@ public class MatchServiceImpl implements MatchService{
 
   @Override
   public MatchResponseDto getById(Long id) {
-    return mapper.toDto(getFindById(id));
+    var match = getFindById(id);
+    match.setCurrentPlayers(match.getParticipants().size());
+    return mapper.toDto(match);
   }
 
   @Override
