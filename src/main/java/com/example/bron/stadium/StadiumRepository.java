@@ -26,7 +26,9 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.isActive,
         s.region.name,
         s.district.name,
-        s.isFavorite
+        s.isFavorite,
+        s.openTime,
+        s.closeTime
     )
     from StadiumEntity s
     
@@ -67,7 +69,9 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.isActive,
         s.region.name,
         s.district.name,
-        s.isFavorite
+        s.isFavorite,
+        s.openTime,
+        s.closeTime
     )
     from StadiumEntity s
     where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})

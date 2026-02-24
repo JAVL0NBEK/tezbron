@@ -6,12 +6,14 @@ import com.example.bron.enums.StadiumDuration;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.location.DistrictRepository;
 import com.example.bron.location.RegionRepository;
+import com.example.bron.stadium.dto.AvailabilitySlotRequestDto;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.stadium.dto.TimeRange;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -105,64 +107,59 @@ public class StadiumServiceImpl implements StadiumService {
     return mapper.toDto(stadiumRepository.save(stadion));
   }
 
-  private StadiumResponseDto buildStadiumResponseWithSlots(StadiumResponseDto stadium,
+  private StadiumResponseDto buildStadiumResponseWithSlots(
+      StadiumResponseDto stadium,
       LocalDate date,
       StadiumDuration duration) {
 
-    LocalDateTime dayStart = date.atStartOfDay();
-    LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+    // Stadion ish vaqtini olish (masalan DB dan)
+    LocalDateTime openTime = stadium.getOpenTime();   // masalan 08:00
+    LocalDateTime closeTime = stadium.getCloseTime(); // masalan 23:00
 
-    // Bookinglarni olish
+    LocalDateTime dayStart = openTime;
+    LocalDateTime dayEnd = closeTime;
+
+    // Shu kunga tegishli bookinglarni olish
     List<BookingEntity> bookings = bookingRepository
-        .findAllByStadiumIdAndStartTimeBetween(stadium.getId(), dayStart, dayEnd);
+        .findConflictingBookings(
+            stadium.getId(),
+            dayStart,
+            dayEnd
+        );
 
-    bookings.sort(Comparator.comparing(BookingEntity::getStartTime));
+    List<AvailabilitySlotRequestDto> slots = generate30MinSlots(dayStart, dayEnd, bookings);
 
-    // Band bo‘lmagan vaqtlarni topish
-    List<TimeRange> freeRanges = calculateFreeRanges(dayStart, dayEnd, bookings);
-
-    // Duration bo‘yicha bo‘sh slotlar yasash
-    List<LocalDateTime> slots = generateAvailableSlots(freeRanges, duration.getMinutes());
-
-    // Responsega yig‘ish
     stadium.setSlots(slots);
 
     return stadium;
   }
-
-  private List<TimeRange> calculateFreeRanges(LocalDateTime dayStart,
-      LocalDateTime dayEnd,
+  private List<AvailabilitySlotRequestDto> generate30MinSlots(
+      LocalDateTime start,
+      LocalDateTime end,
       List<BookingEntity> bookings) {
 
-    List<TimeRange> free = new ArrayList<>();
-    LocalDateTime current = dayStart;
+    List<AvailabilitySlotRequestDto> result = new ArrayList<>();
 
-    for (BookingEntity b : bookings) {
-      if (b.getStartTime().isAfter(current)) {
-        free.add(new TimeRange(current, b.getStartTime()));
-      }
-      if (b.getEndTime().isAfter(current)) {
-        current = b.getEndTime();
-      }
+    LocalDateTime current = start;
+
+    while (current.isBefore(end)) {
+
+      LocalDateTime slotStart = current;
+      LocalDateTime slotEnd = slotStart.plusMinutes(30);
+
+      if (slotEnd.isAfter(end)) break;
+
+      boolean booked = bookings.stream().anyMatch(b ->
+          slotStart.isBefore(b.getEndTime()) &&
+              slotEnd.isAfter(b.getStartTime())
+      );
+
+      result.add(new AvailabilitySlotRequestDto(slotStart, slotEnd, !booked));
+
+      current = slotEnd;
     }
-    if (current.isBefore(dayEnd)) {
-      free.add(new TimeRange(current, dayEnd));
-    }
 
-    return free;
-  }
-
-  private List<LocalDateTime> generateAvailableSlots(List<TimeRange> freeRanges, int durationMinutes) {
-    List<LocalDateTime> slots = new ArrayList<>();
-
-    for (TimeRange range : freeRanges) {
-      LocalDateTime start = range.start();
-      while (!start.plusMinutes(durationMinutes).isAfter(range.end())) {
-        slots.add(start);
-        start = start.plusMinutes(durationMinutes);
-      }
-    }
-    return slots;
+    return result;
   }
 
 }
