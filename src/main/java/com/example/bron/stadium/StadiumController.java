@@ -5,6 +5,7 @@ import com.example.bron.enums.StadiumDuration;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,5 +51,20 @@ public class StadiumController implements StadiumApi {
     stadiumService.delete(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .body(BaseResponse.noContent("Stadium deleted successfully"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<StadiumResponseDto>> updateFavorite(Long id,
+      Boolean isFavorite) {
+    var response = stadiumService.updateFavorite(id, isFavorite);
+    return ResponseEntity.ok(BaseResponse.ok(response));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> updateOpenCloseTime(Long id,
+      LocalDateTime openTime, LocalDateTime closeTime) {
+    stadiumService.updateOpenCloseTime(id, openTime, closeTime);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(BaseResponse.noContent("Stadium open close time change successfully"));
   }
 }

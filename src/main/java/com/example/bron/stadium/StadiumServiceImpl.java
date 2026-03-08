@@ -6,12 +6,14 @@ import com.example.bron.enums.StadiumDuration;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.location.DistrictRepository;
 import com.example.bron.location.RegionRepository;
+import com.example.bron.stadium.dto.AvailabilitySlotRequestDto;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.stadium.dto.TimeRange;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -98,64 +101,96 @@ public class StadiumServiceImpl implements StadiumService {
           pageable);
     }
 
-  private StadiumResponseDto buildStadiumResponseWithSlots(StadiumResponseDto stadium,
+  @Override
+  public StadiumResponseDto updateFavorite(Long id, Boolean isFavorite) {
+      var stadion = getFindById(id);
+      stadion.setIsFavorite(isFavorite);
+    return mapper.toDto(stadiumRepository.save(stadion));
+  }
+
+  @Transactional
+  @Override
+  public void updateOpenCloseTime(Long id, LocalDateTime openTime, LocalDateTime closeTime) {
+    var stadion = getFindById(id);
+    stadion.setOpenTime(openTime);
+    stadion.setCloseTime(closeTime);
+  }
+
+  @Transactional
+  public void updateAllOpenCloseTime(LocalDateTime openTime,
+      LocalDateTime closeTime) {
+
+    stadiumRepository.updateAllOpenCloseTime(openTime, closeTime);
+  }
+
+  private StadiumResponseDto buildStadiumResponseWithSlots(
+      StadiumResponseDto stadium,
       LocalDate date,
       StadiumDuration duration) {
 
-    LocalDateTime dayStart = date.atStartOfDay();
-    LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+    // Stadion ish vaqtini olish (masalan DB dan)
+    LocalDateTime openTime = stadium.getOpenTime();   // masalan 08:00
+    LocalDateTime closeTime = stadium.getCloseTime(); // masalan 23:00
 
-    // Bookinglarni olish
+    LocalDateTime dayStart = openTime;
+    LocalDateTime dayEnd = closeTime;
+
+    // Shu kunga tegishli bookinglarni olish
     List<BookingEntity> bookings = bookingRepository
-        .findAllByStadiumIdAndStartTimeBetween(stadium.getId(), dayStart, dayEnd);
+        .findConflictingBookings(
+            stadium.getId(),
+            dayStart,
+            dayEnd
+        );
 
-    bookings.sort(Comparator.comparing(BookingEntity::getStartTime));
+    List<AvailabilitySlotRequestDto> slots = generate30MinSlots(dayStart, dayEnd, bookings);
 
-    // Band bo‘lmagan vaqtlarni topish
-    List<TimeRange> freeRanges = calculateFreeRanges(dayStart, dayEnd, bookings);
-
-    // Duration bo‘yicha bo‘sh slotlar yasash
-    List<LocalDateTime> slots = generateAvailableSlots(freeRanges, duration.getMinutes());
-
-    // Responsega yig‘ish
     stadium.setSlots(slots);
 
     return stadium;
   }
-
-  private List<TimeRange> calculateFreeRanges(LocalDateTime dayStart,
-      LocalDateTime dayEnd,
+  private List<AvailabilitySlotRequestDto> generate30MinSlots(
+      LocalDateTime start,
+      LocalDateTime end,
       List<BookingEntity> bookings) {
 
-    List<TimeRange> free = new ArrayList<>();
-    LocalDateTime current = dayStart;
+    List<AvailabilitySlotRequestDto> result = new ArrayList<>();
 
-    for (BookingEntity b : bookings) {
-      if (b.getStartTime().isAfter(current)) {
-        free.add(new TimeRange(current, b.getStartTime()));
-      }
-      if (b.getEndTime().isAfter(current)) {
-        current = b.getEndTime();
-      }
-    }
-    if (current.isBefore(dayEnd)) {
-      free.add(new TimeRange(current, dayEnd));
-    }
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime current = start;
 
-    return free;
-  }
+    // Agar bugungi kun bo‘lsa va start hozirgidan oldin bo‘lsa
+    if (start.toLocalDate().equals(now.toLocalDate()) && now.isAfter(start)) {
 
-  private List<LocalDateTime> generateAvailableSlots(List<TimeRange> freeRanges, int durationMinutes) {
-    List<LocalDateTime> slots = new ArrayList<>();
+      int minute = now.getMinute();
 
-    for (TimeRange range : freeRanges) {
-      LocalDateTime start = range.start();
-      while (!start.plusMinutes(durationMinutes).isAfter(range.end())) {
-        slots.add(start);
-        start = start.plusMinutes(durationMinutes);
+      int nextSlotMinute = ((minute / 30) + 1) * 30;
+
+      if (nextSlotMinute == 60) {
+        current = now.withMinute(0).withSecond(0).withNano(0).plusHours(1);
+      } else {
+        current = now.withMinute(nextSlotMinute).withSecond(0).withNano(0);
       }
     }
-    return slots;
+
+    while (current.isBefore(end)) {
+
+      LocalDateTime slotStart = current;
+      LocalDateTime slotEnd = slotStart.plusMinutes(30);
+
+      if (slotEnd.isAfter(end)) break;
+
+      boolean booked = bookings.stream().anyMatch(b ->
+          slotStart.isBefore(b.getEndTime()) &&
+              slotEnd.isAfter(b.getStartTime())
+      );
+
+      result.add(new AvailabilitySlotRequestDto(slotStart, slotEnd, !booked));
+
+      current = slotEnd;
+    }
+
+    return result;
   }
 
 }

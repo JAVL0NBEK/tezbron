@@ -12,6 +12,7 @@ import com.example.bron.stadium.dto.LocationDto;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -70,5 +71,12 @@ public class StadiumEntity {
 
     @OneToMany(mappedBy = "stadium")
     private List<MatchEntity> matches;
+
+    private Boolean isFavorite;
+    @Column(name = "open_time", columnDefinition = "timestamp(6) without time zone")
+    private LocalDateTime openTime;
+
+    @Column(name = "close_time", columnDefinition = "timestamp(6) without time zone")
+    private LocalDateTime closeTime;
 
 }

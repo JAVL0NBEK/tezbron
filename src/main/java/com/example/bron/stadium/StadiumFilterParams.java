@@ -21,6 +21,7 @@ public class StadiumFilterParams {
   private Boolean isActive;
   private Long regionId;
   private Long districtId;
+  private Boolean isFavorite;
 
   @Schema(hidden = true)
   public Boolean getStadiumTypeIsNull() {

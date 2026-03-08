@@ -1,11 +1,14 @@
 package com.example.bron.stadium;
 
 import com.example.bron.stadium.dto.StadiumResponseDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,7 +28,10 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.pricePerHour,
         s.isActive,
         s.region.name,
-        s.district.name
+        s.district.name,
+        s.isFavorite,
+        s.openTime,
+        s.closeTime
     )
     from StadiumEntity s
     
@@ -42,6 +48,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.pricePerHour} is null or s.pricePerHour = :#{#filterParams.pricePerHour})
     and (:#{#filterParams.isActive} is null or s.isActive = :#{#filterParams.isActive})
+    and (:#{#filterParams.isFavorite} is null or s.isFavorite = :#{#filterParams.isFavorite})
     and (:#{#filterParams.description} is null or s.description ilike %:#{#filterParams.description}%)
     and (:#{#filterParams.stadiumTypeIsNull} = TRUE or s.type = :#{#filterParams.type})
     and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})
@@ -64,7 +71,10 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
         s.pricePerHour,
         s.isActive,
         s.region.name,
-        s.district.name
+        s.district.name,
+        s.isFavorite,
+        s.openTime,
+        s.closeTime
     )
     from StadiumEntity s
     where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})
@@ -77,11 +87,21 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
     and (:#{#filterParams.pricePerHour} is null or s.pricePerHour = :#{#filterParams.pricePerHour})
     and (:#{#filterParams.isActive} is null or s.isActive = :#{#filterParams.isActive})
+    and (:#{#filterParams.isFavorite} is null or s.isFavorite = :#{#filterParams.isFavorite})
     and (:#{#filterParams.description} is null or s.description ilike %:#{#filterParams.description}%)
     and (:#{#filterParams.stadiumTypeIsNull} = TRUE or s.type = :#{#filterParams.type})
     and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})
     
 """)
   List<StadiumResponseDto> getByOwnerId(StadiumFilterParams filterParams);
+
+  @Modifying
+  @Query("""
+       update StadiumEntity s
+       set s.openTime = :openTime,
+           s.closeTime = :closeTime
+       """)
+  void updateAllOpenCloseTime(@Param("openTime") LocalDateTime openTime,
+      @Param("closeTime") LocalDateTime closeTime);
 
 }
