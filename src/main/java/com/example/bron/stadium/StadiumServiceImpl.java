@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +108,21 @@ public class StadiumServiceImpl implements StadiumService {
     return mapper.toDto(stadiumRepository.save(stadion));
   }
 
+  @Transactional
+  @Override
+  public void updateOpenCloseTime(Long id, LocalDateTime openTime, LocalDateTime closeTime) {
+    var stadion = getFindById(id);
+    stadion.setOpenTime(openTime);
+    stadion.setCloseTime(closeTime);
+  }
+
+  @Transactional
+  public void updateAllOpenCloseTime(LocalDateTime openTime,
+      LocalDateTime closeTime) {
+
+    stadiumRepository.updateAllOpenCloseTime(openTime, closeTime);
+  }
+
   private StadiumResponseDto buildStadiumResponseWithSlots(
       StadiumResponseDto stadium,
       LocalDate date,
@@ -140,7 +156,22 @@ public class StadiumServiceImpl implements StadiumService {
 
     List<AvailabilitySlotRequestDto> result = new ArrayList<>();
 
+    LocalDateTime now = LocalDateTime.now();
     LocalDateTime current = start;
+
+    // Agar bugungi kun bo‘lsa va start hozirgidan oldin bo‘lsa
+    if (start.toLocalDate().equals(now.toLocalDate()) && now.isAfter(start)) {
+
+      int minute = now.getMinute();
+
+      int nextSlotMinute = ((minute / 30) + 1) * 30;
+
+      if (nextSlotMinute == 60) {
+        current = now.withMinute(0).withSecond(0).withNano(0).plusHours(1);
+      } else {
+        current = now.withMinute(nextSlotMinute).withSecond(0).withNano(0);
+      }
+    }
 
     while (current.isBefore(end)) {
 

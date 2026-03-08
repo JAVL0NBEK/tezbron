@@ -6,6 +6,7 @@ import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,4 +42,9 @@ public interface StadiumApi {
   @PutMapping("/{id}/{isFavorite}")
   ResponseEntity<BaseResponse<StadiumResponseDto>> updateFavorite(@PathVariable Long id,
       @PathVariable Boolean isFavorite);
+
+  @PutMapping("/{id}/{openTime}/{closeTime}")
+  ResponseEntity<BaseResponse<Void>> updateOpenCloseTime(@PathVariable Long id,
+      @PathVariable LocalDateTime openTime,
+      @PathVariable LocalDateTime closeTime);
 }
