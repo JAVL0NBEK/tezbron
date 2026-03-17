@@ -10,5 +10,7 @@ public interface TournamentService {
   TournamentResponseDto create(@RequestBody TournamentRequestDto tournamentRequestDto);
   TournamentResponseDto get(Long id);
   List<TournamentResponseDto> getAll();
+  void addTeamToTournament(Long tournamentId,
+      Long teamId);
 
 }
