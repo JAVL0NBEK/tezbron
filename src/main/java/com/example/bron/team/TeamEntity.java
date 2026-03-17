@@ -1,6 +1,7 @@
 package com.example.bron.team;
 
 import com.example.bron.enums.SportType;
+import com.example.bron.tournament.TournamentTeamEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,5 +39,8 @@ public class TeamEntity {
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+  @OneToMany(mappedBy = "team")
+  private List<TournamentTeamEntity> tournaments;
 
 }

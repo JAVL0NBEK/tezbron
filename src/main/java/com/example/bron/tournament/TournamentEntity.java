@@ -7,6 +7,7 @@ import com.example.bron.stadium.dto.LocationDto;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,5 +56,8 @@ public class TournamentEntity {
     private LocationDto location;
     private String address;
     private String prizes;
+
+  @OneToMany(mappedBy = "tournament")
+  private List<TournamentTeamEntity> teams;
 
 }

@@ -32,4 +32,11 @@ public class TournamentController implements TournamentApi {
     var tournaments = tournamentService.getAll();
     return ResponseEntity.ok(BaseResponse.ok(tournaments));
   }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> addTeamToTournament(Long tournamentId,
+      Long teamId) {
+    tournamentService.addTeamToTournament(tournamentId, teamId);
+    return ResponseEntity.ok(BaseResponse.noContent("Success"));
+  }
 }

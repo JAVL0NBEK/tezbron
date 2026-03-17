@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("v1/tournaments")
 @Tag(name = "Tournament Management APIs", description = "Endpoints for managing tournament")
@@ -24,5 +25,11 @@ public interface TournamentApi {
 
   @GetMapping
   ResponseEntity<BaseResponse<List<TournamentResponseDto>>> getAll();
+
+  @PostMapping("/add-team-to-tournament")
+  ResponseEntity<BaseResponse<Void>> addTeamToTournament(
+      @RequestParam Long tournamentId,
+      @RequestParam Long teamId
+  );
 
 }
