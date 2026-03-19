@@ -78,7 +78,7 @@ public class TeamServiceImpl implements TeamService {
 
   @Override
   public List<TeamResponseDto> getTeams() {
-    var teams = teamRepository.findAll();
+    var teams = teamRepository.findAllWithMembers();
     return teams.stream()
         .map(teamMapper::toDto)
         .toList();
