@@ -55,5 +55,6 @@ public class StadiumResponseDto {
   }
 
   private List<AvailabilitySlotRequestDto> slots;
+  private LocalDateTime earliestAvailable;
 
 }
