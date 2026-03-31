@@ -4,6 +4,7 @@ import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.common.BaseResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/v1/booking")
 @Tag(name = "Booking Management APIs", description = "Endpoints for managing Booking")
@@ -23,8 +25,10 @@ public interface BookingApi {
   @PutMapping("/{id}")
   ResponseEntity<BaseResponse<BookingResponseDto>> updateBooking(@PathVariable Long id, @RequestBody BookingRequestDto bookingRequest);
 
-  @GetMapping("/{id}")
-  ResponseEntity<BaseResponse<BookingResponseDto>> getBooking(@PathVariable Long id);
+  @GetMapping("/by-stadion-id")
+  ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBooking(
+      @RequestParam("stadionId") Long stadionId,
+      @RequestParam("date") LocalDate date);
 
   @GetMapping
   ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBookings();

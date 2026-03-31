@@ -1,5 +1,6 @@
 package com.example.bron.booking;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,4 +33,12 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
       @Param("startTime") LocalDateTime startTime,
       @Param("endTime") LocalDateTime endTime
   );
+
+  @Query("""
+  SELECT b FROM BookingEntity b
+  WHERE b.stadium.id = :stadiumId
+  AND cast(b.startTime as date) = :date
+  """)
+  List<BookingEntity> findIdAndDateBookings(Long stadiumId,
+      LocalDate date);
 }

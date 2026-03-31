@@ -3,6 +3,7 @@ package com.example.bron.booking;
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.common.BaseResponse;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,8 @@ public class BookingController implements BookingApi {
   }
 
   @Override
-  public ResponseEntity<BaseResponse<BookingResponseDto>> getBooking(Long id) {
-    var bookingResponse = bookingService.getBooking(id);
+  public ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBooking(Long id, LocalDate date) {
+    var bookingResponse = bookingService.getBooking(id, date);
     return ResponseEntity.ok(BaseResponse.ok(bookingResponse));
   }
 
