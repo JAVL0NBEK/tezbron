@@ -24,7 +24,7 @@ public interface TeamMapper {
     if (members == null) return List.of();
 
     return members.stream()
-        .map(TeamMemberEntity::getId)
+        .map(m -> m.getUser().getId())
         .toList();
   }
 

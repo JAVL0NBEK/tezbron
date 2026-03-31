@@ -2,6 +2,7 @@ package com.example.bron.stadium;
 
 import com.example.bron.booking.BookingEntity;
 import com.example.bron.booking.BookingRepository;
+import com.example.bron.enums.SlotStatus;
 import com.example.bron.enums.StadiumDuration;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.location.DistrictRepository;
@@ -10,14 +11,9 @@ import com.example.bron.stadium.dto.AvailabilitySlotRequestDto;
 import com.example.bron.stadium.dto.StadiumRequestDto;
 import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.auth.user.UserRepository;
-import com.example.bron.stadium.dto.TimeRange;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -126,71 +122,115 @@ public class StadiumServiceImpl implements StadiumService {
   private StadiumResponseDto buildStadiumResponseWithSlots(
       StadiumResponseDto stadium,
       LocalDate date,
-      StadiumDuration duration) {
+      StadiumDuration duration
+  ) {
+    LocalDateTime dayStart = LocalDateTime.of(date, stadium.getOpenTime().toLocalTime());
+    LocalDateTime dayEnd = LocalDateTime.of(date, stadium.getCloseTime().toLocalTime());
 
-    // Stadion ish vaqtini olish (masalan DB dan)
-    LocalDateTime openTime = stadium.getOpenTime();   // masalan 08:00
-    LocalDateTime closeTime = stadium.getCloseTime(); // masalan 23:00
+    List<BookingEntity> bookings = bookingRepository.findConflictingBookings(
+        stadium.getId(),
+        dayStart,
+        dayEnd
+    );
 
-    LocalDateTime dayStart = openTime;
-    LocalDateTime dayEnd = closeTime;
-
-    // Shu kunga tegishli bookinglarni olish
-    List<BookingEntity> bookings = bookingRepository
-        .findConflictingBookings(
-            stadium.getId(),
-            dayStart,
-            dayEnd
-        );
-
-    List<AvailabilitySlotRequestDto> slots = generate30MinSlots(dayStart, dayEnd, bookings);
+    List<AvailabilitySlotRequestDto> slots = generateSlots(
+        dayStart,
+        dayEnd,
+        duration,
+        bookings
+    );
 
     stadium.setSlots(slots);
-
+    // shu yerda eng yaqin bo'sh vaqtni topasan
+    LocalDateTime earliestAvailable = findEarliestAvailable(slots);
+    stadium.setEarliestAvailable(earliestAvailable);
     return stadium;
   }
-  private List<AvailabilitySlotRequestDto> generate30MinSlots(
-      LocalDateTime start,
-      LocalDateTime end,
-      List<BookingEntity> bookings) {
 
+  private static final int SLOT_STEP_MINUTES = 30;
+
+  private List<AvailabilitySlotRequestDto> generateSlots(
+      LocalDateTime openDateTime,
+      LocalDateTime closeDateTime,
+      StadiumDuration duration,
+      List<BookingEntity> bookings
+  ) {
     List<AvailabilitySlotRequestDto> result = new ArrayList<>();
 
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime current = start;
+    int durationMinutes = duration.getMinutes();
 
-    // Agar bugungi kun bo‘lsa va start hozirgidan oldin bo‘lsa
-    if (start.toLocalDate().equals(now.toLocalDate()) && now.isAfter(start)) {
+    LocalDateTime current = openDateTime;
 
-      int minute = now.getMinute();
+    // Agar bugungi kun bo‘lsa — hozirgi vaqtni keyingi slotga suramiz
+    if (openDateTime.toLocalDate().equals(now.toLocalDate()) && now.isAfter(openDateTime)) {
+      current = roundUpToNextSlot(now);
 
-      int nextSlotMinute = ((minute / 30) + 1) * 30;
-
-      if (nextSlotMinute == 60) {
-        current = now.withMinute(0).withSecond(0).withNano(0).plusHours(1);
-      } else {
-        current = now.withMinute(nextSlotMinute).withSecond(0).withNano(0);
+      if (current.isBefore(openDateTime)) {
+        current = openDateTime;
       }
     }
 
-    while (current.isBefore(end)) {
+    while (!current.plusMinutes(durationMinutes).isAfter(closeDateTime)) {
 
       LocalDateTime slotStart = current;
-      LocalDateTime slotEnd = slotStart.plusMinutes(30);
+      LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
-      if (slotEnd.isAfter(end)) break;
+      SlotStatus status = resolveSlotStatus(slotStart, slotEnd, now, bookings);
 
-      boolean booked = bookings.stream().anyMatch(b ->
-          slotStart.isBefore(b.getEndTime()) &&
-              slotEnd.isAfter(b.getStartTime())
-      );
+      result.add(new AvailabilitySlotRequestDto(slotStart, slotEnd, status));
 
-      result.add(new AvailabilitySlotRequestDto(slotStart, slotEnd, !booked));
-
-      current = slotEnd;
+      current = current.plusMinutes(SLOT_STEP_MINUTES);
     }
 
     return result;
+  }
+
+  private SlotStatus resolveSlotStatus(
+      LocalDateTime slotStart,
+      LocalDateTime slotEnd,
+      LocalDateTime now,
+      List<BookingEntity> bookings
+  ) {
+    // O‘tib ketgan vaqt
+    if (!slotStart.isAfter(now)) {
+      return SlotStatus.PAST;
+    }
+
+    // Booking bilan overlap
+    boolean overlapsBooking = bookings.stream().anyMatch(booking ->
+        slotStart.isBefore(booking.getEndTime()) &&
+            slotEnd.isAfter(booking.getStartTime())
+    );
+
+    if (overlapsBooking) {
+      return SlotStatus.BOOKED;
+    }
+
+    return SlotStatus.AVAILABLE;
+  }
+
+  private LocalDateTime roundUpToNextSlot(LocalDateTime dateTime) {
+    int minute = dateTime.getMinute();
+    int remainder = minute % 30;
+
+    if (remainder == 0 && dateTime.getSecond() == 0) {
+      return dateTime.withSecond(0).withNano(0);
+    }
+
+    int minutesToAdd = 30 - remainder;
+
+    return dateTime.plusMinutes(minutesToAdd)
+        .withSecond(0)
+        .withNano(0);
+  }
+
+  private LocalDateTime findEarliestAvailable(List<AvailabilitySlotRequestDto> slots) {
+    return slots.stream()
+        .filter(slot -> slot.getStatus() == SlotStatus.AVAILABLE)
+        .map(AvailabilitySlotRequestDto::getStart)
+        .findFirst()
+        .orElse(null);
   }
 
 }

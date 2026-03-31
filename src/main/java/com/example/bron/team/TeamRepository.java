@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
 
-  @Query("select t from TeamEntity t join fetch t.members")
+  @Query("select distinct t from TeamEntity t left join fetch t.members")
   List<TeamEntity> findAllWithMembers();
 
 }

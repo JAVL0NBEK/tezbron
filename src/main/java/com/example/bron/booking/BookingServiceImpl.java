@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +21,44 @@ public class BookingServiceImpl implements BookingService {
   private final MatchRepository matchRepository;
   private final BookingMapper bookingMapper;
 
+  @Transactional
   @Override
   public BookingResponseDto createBooking(BookingRequestDto requestDto) {
-    var entity = bookingMapper.toEntity(requestDto);
+    if (!requestDto.getEndTime().isAfter(requestDto.getStartTime())) {
+      throw new NotFoundException("booking_invalid_time_range", List.of());
+    }
+
+    if (requestDto.getStartTime().isBefore(LocalDateTime.now())) {
+      throw new NotFoundException("booking_time_in_past", List.of());
+    }
+
     var user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
-        new NotFoundException("booking_user_not_fount",List.of(requestDto.getUserId().toString())));
-    var stadium = stadiumRepository.findById(requestDto.getStadiumId()).orElseThrow(() ->
-        new NotFoundException("booking_stadium_not_found",List.of(requestDto.getStadiumId().toString())));
+        new NotFoundException("booking_user_not_fount",
+            List.of(requestDto.getUserId().toString()))
+    );
+
+    var stadium = stadiumRepository.findByIdForUpdate(requestDto.getStadiumId()).orElseThrow(() ->
+        new NotFoundException("booking_stadium_not_found",
+            List.of(requestDto.getStadiumId().toString()))
+    );
+
+    boolean exists = bookingRepository.existsOverlappingBooking(
+        requestDto.getStadiumId(),
+        requestDto.getStartTime(),
+        requestDto.getEndTime()
+    );
+
+    if (exists) {
+      throw new NotFoundException("booking_time_already_taken", List.of("exists"));
+    }
+
+    var entity = bookingMapper.toEntity(requestDto);
+
     if (requestDto.getMatchId() != null) {
       var match = matchRepository.findById(requestDto.getMatchId()).orElseThrow(() ->
-          new NotFoundException("booking_match_not_found",List.of(requestDto.getMatchId().toString())));
+          new NotFoundException("booking_match_not_found",
+              List.of(requestDto.getMatchId().toString()))
+      );
       entity.setMatch(match);
     } else {
       entity.setMatch(null);
@@ -38,6 +67,7 @@ public class BookingServiceImpl implements BookingService {
     entity.setCreatedAt(LocalDateTime.now());
     entity.setStadium(stadium);
     entity.setUser(user);
+
     var saved = bookingRepository.save(entity);
     return bookingMapper.toDto(saved);
   }
