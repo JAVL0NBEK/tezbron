@@ -22,6 +22,17 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
       LocalDateTime end);
 
   @Query("""
+  SELECT b FROM BookingEntity b
+  WHERE b.stadium.id IN :stadiumIds
+  AND b.startTime < :end
+  AND b.endTime > :start
+  """)
+  List<BookingEntity> findConflictingBookingsForStadiums(
+      @Param("stadiumIds") List<Long> stadiumIds,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  @Query("""
     select case when count(b) > 0 then true else false end
     from BookingEntity b
     where b.stadium.id = :stadiumId

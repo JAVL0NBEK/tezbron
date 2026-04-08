@@ -28,6 +28,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity,Long> {
   and (:#{#filterParams.regionId} is null or match.stadium.region.id = :#{#filterParams.regionId})
   and (:#{#filterParams.districtId} is null or match.stadium.district.id = :#{#filterParams.districtId})
   and (:#{#filterParams.sportTypeIsNull} = TRUE or match.sportType = :#{#filterParams.sportType})
+  order by match.id desc
 """)
   List<MatchResponseDto> getAll(MatchFilterParams filterParams);
 

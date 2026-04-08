@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   public List<BookingResponseDto> getBookings() {
-    var bookings = bookingRepository.findAll();
+    var bookings = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     return bookings.stream()
         .map(bookingMapper::toDto)
         .toList();
