@@ -1,19 +1,16 @@
 package com.example.bron.auth.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import java.io.IOException;
-import java.security.Key;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -26,6 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final CustomUserDetailsService userDetailsService;
+  private final ObjectMapper objectMapper;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
@@ -45,7 +43,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     try {
       String username = jwtService.extractUsername(token);
 
-      // Agar hali authenticate qilinmagan bo‘lsa
       if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -65,11 +62,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
       }
 
+    } catch (ExpiredJwtException e) {
+      SecurityContextHolder.clearContext();
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+      objectMapper.writeValue(response.getOutputStream(), Map.of(
+          "success", false,
+          "code", "TOKEN_EXPIRED",
+          "message", "Access token muddati tugagan. /api/auth/refresh orqali yangilang."
+      ));
+      return;
+
     } catch (Exception e) {
       SecurityContextHolder.clearContext();
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+      objectMapper.writeValue(response.getOutputStream(), Map.of(
+          "success", false,
+          "code", "TOKEN_INVALID",
+          "message", "Token yaroqsiz"
+      ));
+      return;
     }
 
     filterChain.doFilter(request, response);
   }
 }
-
