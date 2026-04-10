@@ -13,7 +13,11 @@ import com.example.bron.stadium.dto.StadiumResponseDto;
 import com.example.bron.auth.user.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,15 +89,47 @@ public class StadiumServiceImpl implements StadiumService {
       filter.setOwnerId(stadium.getOwner().getId());
       List<StadiumResponseDto> stadiums = stadiumRepository.getByOwnerId(filter);
 
-      // 3) Har bir stadion uchun slotlar generatsiya qilamiz
+      if (stadiums.isEmpty()) {
+        return List.of();
+      }
+
+      // 3) Bitta query bilan barcha stadionlar uchun shu kunga tegishli bookinglarni olamiz
+      List<Long> stadiumIds = stadiums.stream()
+          .map(StadiumResponseDto::getId)
+          .toList();
+
+      // Per-stadium open/close vaqtlarining birlashmasi: eng erta open va eng kech close
+      LocalTime earliestOpen = stadiums.stream()
+          .map(s -> s.getOpenTime().toLocalTime())
+          .min(LocalTime::compareTo)
+          .orElse(LocalTime.MIN);
+      LocalTime latestClose = stadiums.stream()
+          .map(s -> s.getCloseTime().toLocalTime())
+          .max(LocalTime::compareTo)
+          .orElse(LocalTime.MAX);
+
+      LocalDateTime dayRangeStart = LocalDateTime.of(date, earliestOpen);
+      LocalDateTime dayRangeEnd = LocalDateTime.of(date, latestClose);
+
+      Map<Long, List<BookingEntity>> bookingsByStadium = bookingRepository
+          .findConflictingBookingsForStadiums(stadiumIds, dayRangeStart, dayRangeEnd)
+          .stream()
+          .collect(Collectors.groupingBy(b -> b.getStadium().getId()));
+
+      // 4) Har bir stadion uchun slotlar generatsiya qilamiz (qo‘shimcha query yo‘q)
       return stadiums.stream()
-          .map(st -> buildStadiumResponseWithSlots(st, date, duration))
+          .map(st -> buildStadiumResponseWithSlots(
+              st,
+              date,
+              duration,
+              bookingsByStadium.getOrDefault(st.getId(), Collections.emptyList())
+          ))
           .toList();
     }
 
     @Override
     public Page<StadiumResponseDto> getAll(StadiumFilterParams filterParams, Pageable pageable) {
-      return stadiumRepository.getDistinctByOwner(filterParams,
+      return stadiumRepository.getAllStadions(filterParams,
           pageable);
     }
 
@@ -122,16 +158,11 @@ public class StadiumServiceImpl implements StadiumService {
   private StadiumResponseDto buildStadiumResponseWithSlots(
       StadiumResponseDto stadium,
       LocalDate date,
-      StadiumDuration duration
+      StadiumDuration duration,
+      List<BookingEntity> bookings
   ) {
     LocalDateTime dayStart = LocalDateTime.of(date, stadium.getOpenTime().toLocalTime());
     LocalDateTime dayEnd = LocalDateTime.of(date, stadium.getCloseTime().toLocalTime());
-
-    List<BookingEntity> bookings = bookingRepository.findConflictingBookings(
-        stadium.getId(),
-        dayStart,
-        dayEnd
-    );
 
     List<AvailabilitySlotRequestDto> slots = generateSlots(
         dayStart,

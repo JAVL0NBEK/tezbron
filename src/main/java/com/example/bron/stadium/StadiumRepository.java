@@ -96,6 +96,45 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})
     
 """)
+  Page<StadiumResponseDto> getAllStadions(StadiumFilterParams filterParams,
+      Pageable pageable);
+
+  @Query("""
+    select new com.example.bron.stadium.dto.StadiumResponseDto(
+        s.id,
+        s.name,
+        s.owner.id,
+        s.owner.fullName,
+        s.description,
+        s.location,
+        s.type,
+        s.duration,
+        s.capacity,
+        s.pricePerHour,
+        s.isActive,
+        s.region.name,
+        s.district.name,
+        s.isFavorite,
+        s.openTime,
+        s.closeTime
+    )
+    from StadiumEntity s
+    where (:#{#filterParams.id} is null or s.id = :#{#filterParams.id})
+    and (:#{#filterParams.regionId} is null or s.region.id = :#{#filterParams.regionId})
+    and (:#{#filterParams.districtId} is null or s.district.id = :#{#filterParams.districtId})
+    and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
+    and (:#{#filterParams.name} is null or s.name ilike %:#{#filterParams.name}%)
+    and (:#{#filterParams.ownerName} is null or s.owner.fullName ilike %:#{#filterParams.ownerName}%)
+    and (:#{#filterParams.ownerId} is null or s.owner.id = :#{#filterParams.ownerId})
+    and (:#{#filterParams.capacity} is null or s.capacity = :#{#filterParams.capacity})
+    and (:#{#filterParams.pricePerHour} is null or s.pricePerHour = :#{#filterParams.pricePerHour})
+    and (:#{#filterParams.isActive} is null or s.isActive = :#{#filterParams.isActive})
+    and (:#{#filterParams.isFavorite} is null or s.isFavorite = :#{#filterParams.isFavorite})
+    and (:#{#filterParams.description} is null or s.description ilike %:#{#filterParams.description}%)
+    and (:#{#filterParams.stadiumTypeIsNull} = TRUE or s.type = :#{#filterParams.type})
+    and (:#{#filterParams.stadiumDurationIsNull} = TRUE or s.duration = :#{#filterParams.duration})
+    
+""")
   List<StadiumResponseDto> getByOwnerId(StadiumFilterParams filterParams);
 
   @Modifying

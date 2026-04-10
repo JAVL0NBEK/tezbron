@@ -6,6 +6,7 @@ import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.MatchRepository;
 import com.example.bron.stadium.StadiumRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -79,17 +80,16 @@ public class BookingServiceImpl implements BookingService {
   }
 
   @Override
-  public BookingResponseDto getBooking(Long id) {
-    var booking = bookingEntity(id);
-    return bookingMapper.toDto(booking);
-  }
-
-  @Override
-  public List<BookingResponseDto> getBookings() {
-    var bookings = bookingRepository.findAll();
+  public List<BookingResponseDto> getBooking(Long id, LocalDate date) {
+    var bookings = bookingRepository.findIdAndDateBookings(id, date);
     return bookings.stream()
         .map(bookingMapper::toDto)
         .toList();
+  }
+
+  @Override
+  public List<BookingResponseDto> getBookings(BookingFilterParams filterParams) {
+    return bookingRepository.getAll(filterParams);
   }
 
   private BookingEntity bookingEntity(Long id){

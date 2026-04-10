@@ -24,7 +24,7 @@ public interface TournamentApi {
   ResponseEntity<BaseResponse<TournamentResponseDto>> get(@PathVariable Long id);
 
   @GetMapping
-  ResponseEntity<BaseResponse<List<TournamentResponseDto>>> getAll();
+  ResponseEntity<BaseResponse<List<TournamentResponseDto>>> getAll(TournamentFilterParams filterParams);
 
   @PostMapping("/add-team-to-tournament")
   ResponseEntity<BaseResponse<Void>> addTeamToTournament(

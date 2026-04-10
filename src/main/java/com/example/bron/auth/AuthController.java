@@ -2,6 +2,8 @@ package com.example.bron.auth;
 
 import com.example.bron.auth.dto.LoginRequestDto;
 import com.example.bron.auth.dto.LoginResponseDto;
+import com.example.bron.auth.dto.RefreshTokenRequestDto;
+import com.example.bron.auth.dto.TokenResponseDto;
 import com.example.bron.common.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,18 @@ public class AuthController implements AuthApi {
 
 
   @Override
-    public ResponseEntity<LoginResponseDto> login(LoginRequestDto loginRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest));
-    }
+  public ResponseEntity<LoginResponseDto> login(LoginRequestDto loginRequest) {
+      return ResponseEntity.ok(authService.login(loginRequest));
+  }
+
+  @Override
+  public ResponseEntity<TokenResponseDto> refresh(RefreshTokenRequestDto request) {
+    return ResponseEntity.ok(authService.refresh(request));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> logout(RefreshTokenRequestDto request) {
+    authService.logout(request);
+    return ResponseEntity.ok(BaseResponse.noContent("Logout muvaffaqiyatli"));
+  }
 }

@@ -41,9 +41,8 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public List<TournamentResponseDto> getAll() {
-    var tournaments = tournamentRepository.findAll();
-    return tournaments.stream().map(mapper::toDto).toList();
+  public List<TournamentResponseDto> getAll(TournamentFilterParams filterParams) {
+    return tournamentRepository.getAll(filterParams);
   }
 
   @Transactional
