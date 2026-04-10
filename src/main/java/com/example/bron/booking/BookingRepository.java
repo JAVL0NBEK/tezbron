@@ -55,6 +55,12 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
       LocalDate date);
 
   @Query("""
+  SELECT b FROM BookingEntity b
+  WHERE b.startTime BETWEEN :from AND :to
+  """)
+  List<BookingEntity> findUpcomingBookings(LocalDateTime from, LocalDateTime to);
+
+  @Query("""
   select new com.example.bron.booking.dto.BookingResponseDto(
   b.id,
   b.user.id,

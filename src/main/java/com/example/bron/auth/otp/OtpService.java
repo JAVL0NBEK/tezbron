@@ -84,7 +84,7 @@ public class OtpService {
   }
 
   private String generateOtp() {
-    int number = random.nextInt(900_000) + 100_000; // 6 xonali OTP
+    int number = random.nextInt(9000) + 1000; // 4 xonali OTP
     return String.valueOf(number);
   }
 
