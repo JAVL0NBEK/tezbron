@@ -1,5 +1,6 @@
 package com.example.bron.booking;
 
+import com.example.bron.booking.dto.BookingResponseDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,4 +53,28 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   """)
   List<BookingEntity> findIdAndDateBookings(Long stadiumId,
       LocalDate date);
+
+  @Query("""
+  select new com.example.bron.booking.dto.BookingResponseDto(
+  b.id,
+  b.user.id,
+  b.stadium.id,
+  b.match.id,
+  b.startTime,
+  b.endTime,
+  b.totalPrice,
+  b.status,
+  b.paymentMethod
+  ) from BookingEntity b
+  where (:#{#filterParams.userId} is null or b.user.id = :#{#filterParams.userId})
+  and (:#{#filterParams.stadiumId} is null or b.stadium.id = :#{#filterParams.stadiumId})
+  and (:#{#filterParams.matchId} is null or b.match.id = :#{#filterParams.matchId})
+  and (:#{#filterParams.startDateFromIsNull} = TRUE or cast(b.startTime as date) >= :#{#filterParams.startDateFrom})
+  and (:#{#filterParams.startDateToIsNull} = TRUE or cast(b.startTime as date) <= :#{#filterParams.startDateTo})
+  and (:#{#filterParams.totalPrice} is null or b.totalPrice = :#{#filterParams.totalPrice})
+  and (:#{#filterParams.statusIsNull} = TRUE or b.status = :#{#filterParams.status})
+  and (:#{#filterParams.paymentMethod} is null or b.paymentMethod ilike %:#{#filterParams.paymentMethod}%)
+  order by b.id desc
+  """)
+  List<BookingResponseDto> getAll(BookingFilterParams filterParams);
 }

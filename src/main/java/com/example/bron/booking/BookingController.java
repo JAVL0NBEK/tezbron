@@ -37,8 +37,8 @@ public class BookingController implements BookingApi {
   }
 
   @Override
-  public ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBookings() {
-    var bookings = bookingService.getBookings();
+  public ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBookings(BookingFilterParams filterParams) {
+    var bookings = bookingService.getBookings(filterParams);
     return ResponseEntity.ok(BaseResponse.ok(bookings));
   }
 }

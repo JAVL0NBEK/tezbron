@@ -31,6 +31,6 @@ public interface BookingApi {
       @RequestParam("date") LocalDate date);
 
   @GetMapping
-  ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBookings();
+  ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBookings(BookingFilterParams filterParams);
 
 }

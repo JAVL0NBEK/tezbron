@@ -9,6 +9,6 @@ public interface BookingService {
   BookingResponseDto createBooking(BookingRequestDto bookingRequestDto);
   BookingResponseDto updateBooking(Long id, BookingRequestDto bookingRequestDto);
   List<BookingResponseDto> getBooking(Long id, LocalDate date);
-  List<BookingResponseDto> getBookings();
+  List<BookingResponseDto> getBookings(BookingFilterParams filterParams);
 
 }
