@@ -5,11 +5,14 @@ import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.MatchRepository;
+import com.example.bron.notification.enums.NotificationTemplate;
+import com.example.bron.notification.event.BookingEvent;
 import com.example.bron.stadium.StadiumRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ public class BookingServiceImpl implements BookingService {
   private final StadiumRepository stadiumRepository;
   private final MatchRepository matchRepository;
   private final BookingMapper bookingMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   @Override
@@ -70,6 +74,13 @@ public class BookingServiceImpl implements BookingService {
     entity.setUser(user);
 
     var saved = bookingRepository.save(entity);
+
+    eventPublisher.publishEvent(new BookingEvent(
+        user.getId(),
+        NotificationTemplate.BOOKING_CONFIRMED,
+        stadium.getName(), saved.getStartTime().toString()
+    ));
+
     return bookingMapper.toDto(saved);
   }
 

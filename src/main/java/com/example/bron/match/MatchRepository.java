@@ -1,6 +1,7 @@
 package com.example.bron.match;
 
 import com.example.bron.match.dto.MatchResponseDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,5 +39,11 @@ public interface MatchRepository extends JpaRepository<MatchEntity,Long> {
   order by match.id desc
 """)
   List<MatchResponseDto> getAll(MatchFilterParams filterParams);
+
+  @Query("""
+  SELECT m FROM MatchEntity m
+  WHERE m.dateTime BETWEEN :from AND :to
+  """)
+  List<MatchEntity> findUpcomingMatches(LocalDateTime from, LocalDateTime to);
 
 }

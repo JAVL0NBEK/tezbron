@@ -1,6 +1,7 @@
 package com.example.bron.tournament;
 
 import com.example.bron.tournament.dto.TournamentResponseDto;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -40,5 +41,7 @@ public interface TournamentRepository extends JpaRepository<TournamentEntity, Lo
   order by t.id desc
   """)
   List<TournamentResponseDto> getAll(TournamentFilterParams filterParams);
+
+  List<TournamentEntity> findByStartDate(LocalDate startDate);
 
 }

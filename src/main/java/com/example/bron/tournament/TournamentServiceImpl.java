@@ -3,12 +3,15 @@ package com.example.bron.tournament;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.enums.BookingStatus;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.notification.enums.NotificationTemplate;
+import com.example.bron.notification.event.TournamentEvent;
 import com.example.bron.team.TeamRepository;
 import com.example.bron.tournament.dto.TournamentRequestDto;
 import com.example.bron.tournament.dto.TournamentResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,7 @@ public class TournamentServiceImpl implements TournamentService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
   private final TournamentMapper mapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   public TournamentResponseDto create(TournamentRequestDto dto) {
@@ -84,6 +88,15 @@ public class TournamentServiceImpl implements TournamentService {
 
     tournament.setTeamApplied(
         (tournament.getTeamApplied() == null ? 0 : tournament.getTeamApplied()) + 1
+    );
+
+    // Jamoa a'zolariga notification yuborish
+    team.getMembers().forEach(member ->
+        eventPublisher.publishEvent(new TournamentEvent(
+            member.getUser().getId(),
+            NotificationTemplate.TOURNAMENT_TEAM_REGISTERED,
+            tournament.getName()
+        ))
     );
   }
 }

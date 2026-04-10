@@ -5,11 +5,14 @@ import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.dto.JoinMatchRequestDto;
 import com.example.bron.match.dto.MatchRequestDto;
 import com.example.bron.match.dto.MatchResponseDto;
+import com.example.bron.notification.enums.NotificationTemplate;
+import com.example.bron.notification.event.MatchEvent;
 import com.example.bron.stadium.StadiumRepository;
 import com.example.bron.auth.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +23,7 @@ public class MatchServiceImpl implements MatchService{
   private final UserRepository userRepository;
   private final StadiumRepository stadiumRepository;
   private final MatchMapper mapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   public MatchResponseDto create(MatchRequestDto dto) {
@@ -77,6 +81,25 @@ public class MatchServiceImpl implements MatchService{
     matchParticipant.setJoinedAt(LocalDateTime.now());
     matchParticipant.setStatus(ParticipantStatus.REQUESTED);
     matchParticipantRepository.save(matchParticipant);
+
+    eventPublisher.publishEvent(new MatchEvent(
+        dto.userId(),
+        NotificationTemplate.MATCH_JOINED,
+        match.getTitle()
+    ));
+
+    // match to'lganini tekshirish
+    if (matchParticipantRepository.countByMatchId(matchId) >= match.getMaxPlayers()) {
+      var participantIds = match.getParticipants().stream()
+          .map(p -> p.getUser().getId())
+          .toList();
+      eventPublisher.publishEvent(new MatchEvent(
+          participantIds,
+          NotificationTemplate.MATCH_FULL,
+          match.getTitle()
+      ));
+    }
+
     return mapper.toDto(match);
   }
 
@@ -93,6 +116,12 @@ public class MatchServiceImpl implements MatchService{
     }
 
     matchParticipantRepository.delete(matchParticipant);
+
+    eventPublisher.publishEvent(new MatchEvent(
+        match.getOrganizer().getId(),
+        NotificationTemplate.MATCH_PLAYER_LEFT,
+        match.getTitle()
+    ));
   }
 
   private MatchEntity getFindById(Long id) {
