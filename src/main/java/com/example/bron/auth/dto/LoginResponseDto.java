@@ -29,6 +29,9 @@ public class LoginResponseDto {
   private String passwordHash;
 
   private String accessToken;
+  private String refreshToken;
+  private Long accessTokenExpiresIn;  // sekundda
+  private Long refreshTokenExpiresIn; // sekundda
 
   private DistrictEntity district;
 

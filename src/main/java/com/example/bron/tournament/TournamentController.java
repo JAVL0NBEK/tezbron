@@ -28,8 +28,8 @@ public class TournamentController implements TournamentApi {
   }
 
   @Override
-  public ResponseEntity<BaseResponse<List<TournamentResponseDto>>> getAll() {
-    var tournaments = tournamentService.getAll();
+  public ResponseEntity<BaseResponse<List<TournamentResponseDto>>> getAll(TournamentFilterParams filterParams) {
+    var tournaments = tournamentService.getAll(filterParams);
     return ResponseEntity.ok(BaseResponse.ok(tournaments));
   }
 

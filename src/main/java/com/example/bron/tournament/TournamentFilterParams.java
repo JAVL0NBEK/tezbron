@@ -1,8 +1,7 @@
-package com.example.bron.match;
+package com.example.bron.tournament;
 
-import com.example.bron.enums.Duration;
-import com.example.bron.enums.MatchStatus;
 import com.example.bron.enums.SportType;
+import com.example.bron.enums.TournamentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Getter;
@@ -16,21 +15,18 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 @Setter
 @ToString
 @NoArgsConstructor
-public class MatchFilterParams {
-  private String title;
+public class TournamentFilterParams {
+  private String name;
   private Long organizerId;
-  private Long stadiumId;
-  private Long regionId;
-  private Long districtId;
   @DateTimeFormat(iso = ISO.DATE)
   private LocalDate startDateFrom;
   @DateTimeFormat(iso = ISO.DATE)
   private LocalDate startDateTo;
-  private Duration duration;
   private SportType sportType;
-  private Integer maxPlayers;
-  private Double pricePerPlayer;
-  private MatchStatus status;
+  private Integer maxTeams;
+  private Double entryFee;
+  private TournamentStatus status;
+  private String address;
 
   @Schema(hidden = true)
   public Boolean getStartDateFromIsNull() {
@@ -45,11 +41,6 @@ public class MatchFilterParams {
   @Schema(hidden = true)
   public Boolean getSportTypeIsNull() {
     return this.sportType == null;
-  }
-
-  @Schema(hidden = true)
-  public Boolean getDurationIsNull() {
-    return this.duration == null;
   }
 
   @Schema(hidden = true)
