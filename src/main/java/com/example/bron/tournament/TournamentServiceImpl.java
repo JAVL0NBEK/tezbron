@@ -33,7 +33,9 @@ public class TournamentServiceImpl implements TournamentService {
     var tournamentEntity = mapper.toEntity(dto);
     tournamentEntity.setOrganizer(organizer);
     var savedTournament = tournamentRepository.save(tournamentEntity);
-    return mapper.toDto(savedTournament);
+    var response = mapper.toDto(savedTournament);
+    response.setTeamApplied(0L);
+    return response;
   }
 
   @Override
@@ -41,7 +43,9 @@ public class TournamentServiceImpl implements TournamentService {
     var tournament = tournamentRepository.findById(id).orElseThrow(
         () -> new NotFoundException("tournament_id_not_found",List.of(id.toString()))
     );
-    return mapper.toDto(tournament);
+    var dto = mapper.toDto(tournament);
+    dto.setTeamApplied(tournamentTeamRepository.countByTournamentId(id));
+    return dto;
   }
 
   @Override
@@ -85,10 +89,6 @@ public class TournamentServiceImpl implements TournamentService {
     entity.setStatus(BookingStatus.CONFIRMED);
 
     tournamentTeamRepository.save(entity);
-
-    tournament.setTeamApplied(
-        (tournament.getTeamApplied() == null ? 0 : tournament.getTeamApplied()) + 1
-    );
 
     // Jamoa a'zolariga notification yuborish
     team.getMembers().forEach(member ->

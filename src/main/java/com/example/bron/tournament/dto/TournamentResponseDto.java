@@ -26,8 +26,8 @@ public class TournamentResponseDto {
   private SportType sportType;
 
   private Integer maxTeams;
-  private Integer teamApplied;
-  private Double entryFee;
+  private Long teamApplied;
+  private Long entryFee;
 
   private String rules;
 

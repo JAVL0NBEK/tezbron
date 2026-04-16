@@ -1,8 +1,10 @@
 package com.example.bron.auth;
 
+import com.example.bron.auth.dto.ChangePasswordRequestDto;
 import com.example.bron.auth.dto.LoginRequestDto;
 import com.example.bron.auth.dto.LoginResponseDto;
 import com.example.bron.auth.dto.RefreshTokenRequestDto;
+import com.example.bron.auth.dto.StaffLoginRequestDto;
 import com.example.bron.auth.dto.TokenResponseDto;
 import com.example.bron.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +29,10 @@ public interface AuthApi {
     @Operation(summary = "REST request to user login")
     ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest);
 
+    @PostMapping("/staff/login")
+    @Operation(summary = "Admin/Owner/Coach login (username + password)")
+    ResponseEntity<LoginResponseDto> staffLogin(@Valid @RequestBody StaffLoginRequestDto request);
+
     @PostMapping("/refresh")
     @Operation(summary = "Access tokenni refresh token bilan yangilash")
     ResponseEntity<TokenResponseDto> refresh(@Valid @RequestBody RefreshTokenRequestDto request);
@@ -34,4 +40,8 @@ public interface AuthApi {
     @PostMapping("/logout")
     @Operation(summary = "Refresh tokenni bekor qilish (logout)")
     ResponseEntity<BaseResponse<Void>> logout(@Valid @RequestBody RefreshTokenRequestDto request);
+
+    @PostMapping("/change-password")
+    @Operation(summary = "Joriy foydalanuvchi parolini almashtirish (eski parolni tekshiradi)")
+    ResponseEntity<BaseResponse<Void>> changePassword(@Valid @RequestBody ChangePasswordRequestDto request);
 }

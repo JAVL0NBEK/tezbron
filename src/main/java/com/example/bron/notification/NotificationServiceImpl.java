@@ -8,7 +8,9 @@ import com.example.bron.notification.dto.NotificationResponseDto;
 import com.example.bron.notification.enums.NotificationTarget;
 import com.example.bron.notification.enums.NotificationTemplate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -57,7 +59,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     var notification = saveNotification(dto, NotificationTarget.USER);
     saveUserNotification(user.getId(), notification);
-    fcmService.sendToUser(user.getId(), dto.getTitle(), dto.getBody(), deviceTokenRepository);
+    fcmService.sendToUser(user.getId(), dto.getTitle(), dto.getBody(),
+        buildDataPayload(notification), deviceTokenRepository);
   }
 
   @Override
@@ -69,7 +72,8 @@ public class NotificationServiceImpl implements NotificationService {
     for (var user : allUsers) {
       saveUserNotification(user.getId(), notification);
     }
-    fcmService.sendToAll(dto.getTitle(), dto.getBody(), deviceTokenRepository);
+    fcmService.sendToAll(dto.getTitle(), dto.getBody(),
+        buildDataPayload(notification), deviceTokenRepository);
   }
 
   @Async
@@ -88,7 +92,8 @@ public class NotificationServiceImpl implements NotificationService {
     notificationRepository.save(notification);
 
     saveUserNotification(userId, notification);
-    fcmService.sendToUser(userId, title, body, deviceTokenRepository);
+    fcmService.sendToUser(userId, title, body,
+        buildDataPayload(notification), deviceTokenRepository);
   }
 
   @Async
@@ -109,7 +114,8 @@ public class NotificationServiceImpl implements NotificationService {
     for (Long userId : userIds) {
       saveUserNotification(userId, notification);
     }
-    fcmService.sendToUsers(userIds, title, body, deviceTokenRepository);
+    fcmService.sendToUsers(userIds, title, body,
+        buildDataPayload(notification), deviceTokenRepository);
   }
 
   @Override
@@ -170,6 +176,14 @@ public class NotificationServiceImpl implements NotificationService {
       notification.setSender(sender);
     }
     return notificationRepository.save(notification);
+  }
+
+  private Map<String, String> buildDataPayload(NotificationEntity notification) {
+    Map<String, String> data = new HashMap<>();
+    data.put("notificationId", notification.getId().toString());
+    data.put("type", notification.getType().name());
+    data.put("targetType", notification.getTargetType().name());
+    return data;
   }
 
   private void saveUserNotification(Long userId, NotificationEntity notification) {

@@ -1,5 +1,5 @@
 package com.example.bron.enums;
 
 public enum LoginStatus {
-  REGISTER_REQUIRED, INVALID_OTP
+  REGISTER_REQUIRED, INVALID_OTP, INVALID_CREDENTIALS
 }

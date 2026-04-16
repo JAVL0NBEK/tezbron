@@ -42,9 +42,8 @@ public class TournamentEntity {
 
     private Integer maxTeams;
 
-    private Integer teamApplied;
-
-    private Double entryFee;
+    @Column(name = "entry_fee")
+    private Long entryFee;
 
     private String rules;
 
