@@ -24,7 +24,7 @@ public class TournamentFilterParams {
   private LocalDate startDateTo;
   private SportType sportType;
   private Integer maxTeams;
-  private Double entryFee;
+  private Long maxEntryFee;
   private TournamentStatus status;
   private String address;
 

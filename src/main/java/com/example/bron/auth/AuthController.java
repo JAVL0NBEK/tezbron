@@ -1,8 +1,10 @@
 package com.example.bron.auth;
 
+import com.example.bron.auth.dto.ChangePasswordRequestDto;
 import com.example.bron.auth.dto.LoginRequestDto;
 import com.example.bron.auth.dto.LoginResponseDto;
 import com.example.bron.auth.dto.RefreshTokenRequestDto;
+import com.example.bron.auth.dto.StaffLoginRequestDto;
 import com.example.bron.auth.dto.TokenResponseDto;
 import com.example.bron.common.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,11 @@ public class AuthController implements AuthApi {
   }
 
   @Override
+  public ResponseEntity<LoginResponseDto> staffLogin(StaffLoginRequestDto request) {
+    return ResponseEntity.ok(authService.staffLogin(request));
+  }
+
+  @Override
   public ResponseEntity<TokenResponseDto> refresh(RefreshTokenRequestDto request) {
     return ResponseEntity.ok(authService.refresh(request));
   }
@@ -43,5 +50,11 @@ public class AuthController implements AuthApi {
   public ResponseEntity<BaseResponse<Void>> logout(RefreshTokenRequestDto request) {
     authService.logout(request);
     return ResponseEntity.ok(BaseResponse.noContent("Logout muvaffaqiyatli"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<Void>> changePassword(ChangePasswordRequestDto request) {
+    authService.changePassword(request);
+    return ResponseEntity.ok(BaseResponse.noContent("Parol muvaffaqiyatli o'zgartirildi"));
   }
 }

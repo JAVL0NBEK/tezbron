@@ -19,7 +19,7 @@ public interface TournamentRepository extends JpaRepository<TournamentEntity, Lo
   t.endDate,
   t.sportType,
   t.maxTeams,
-  t.teamApplied,
+  (select cast(count(tt) as long) from TournamentTeamEntity tt where tt.tournament = t),
   t.entryFee,
   t.rules,
   t.status,
@@ -35,7 +35,7 @@ public interface TournamentRepository extends JpaRepository<TournamentEntity, Lo
   and (:#{#filterParams.startDateToIsNull} = TRUE or t.startDate <= :#{#filterParams.startDateTo})
   and (:#{#filterParams.sportTypeIsNull} = TRUE or t.sportType = :#{#filterParams.sportType})
   and (:#{#filterParams.maxTeams} is null or t.maxTeams = :#{#filterParams.maxTeams})
-  and (:#{#filterParams.entryFee} is null or t.entryFee = :#{#filterParams.entryFee})
+  and (:#{#filterParams.maxEntryFee} is null or t.entryFee <= :#{#filterParams.maxEntryFee})
   and (:#{#filterParams.statusIsNull} = TRUE or t.status = :#{#filterParams.status})
   and (:#{#filterParams.address} is null or t.address ilike %:#{#filterParams.address}%)
   order by t.id desc
