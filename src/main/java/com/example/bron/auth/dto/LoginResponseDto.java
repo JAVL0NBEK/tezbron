@@ -3,6 +3,7 @@ package com.example.bron.auth.dto;
 import com.example.bron.enums.LoginStatus;
 import com.example.bron.location.DistrictEntity;
 import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,8 @@ public class LoginResponseDto {
   private String profileImageUrl;
   private LocalDateTime createdAt;
   private LoginStatus status;
+
+  private Set<String> roles;
 
   public LoginResponseDto(LoginStatus status) {
     this.status = status;

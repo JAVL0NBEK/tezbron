@@ -97,10 +97,10 @@ public class UserServiceImpl implements UserService {
       coachRepository.save(coach);
     }
 
-    String message = String.format(
-        "Tezbron tizimiga kirish. Login: %s, Parol: %s",
-        dto.getUsername(), rawPassword);
-    eskizSmsService.sendSms(dto.getPhone(), message);
+//    String message = String.format(
+//        "Tezbron tizimiga kirish. Login: %s, Parol: %s",
+//        dto.getUsername(), rawPassword);
+//    eskizSmsService.sendSms(dto.getPhone(), message);
 
     return mapper.toDto(saved);
   }

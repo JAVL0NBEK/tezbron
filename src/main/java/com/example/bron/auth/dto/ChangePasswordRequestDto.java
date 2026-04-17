@@ -10,6 +10,6 @@ public class ChangePasswordRequestDto {
   private String oldPassword;
 
   @NotBlank
-  @Size(min = 6, message = "Parol kamida 6 ta belgidan iborat bo'lishi kerak")
+  @Size(min = 8, message = "Parol kamida 6 ta belgidan iborat bo'lishi kerak")
   private String newPassword;
 }
