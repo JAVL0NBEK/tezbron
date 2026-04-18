@@ -1,8 +1,15 @@
 package com.example.bron.tournament;
 
+import com.example.bron.auth.security.CurrentUserService;
+import com.example.bron.auth.user.UserEntity;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.enums.BookingStatus;
+import com.example.bron.exception.BadRequestException;
+import com.example.bron.exception.ConflictException;
+import com.example.bron.exception.ForbiddenException;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.location.DistrictEntity;
+import com.example.bron.location.DistrictRepository;
 import com.example.bron.notification.enums.NotificationTemplate;
 import com.example.bron.notification.event.TournamentEvent;
 import com.example.bron.team.TeamRepository;
@@ -22,16 +29,38 @@ public class TournamentServiceImpl implements TournamentService {
   private final TournamentTeamRepository tournamentTeamRepository;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
+  private final DistrictRepository districtRepository;
   private final TournamentMapper mapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final CurrentUserService currentUserService;
 
   @Override
   public TournamentResponseDto create(TournamentRequestDto dto) {
-    var organizer = userRepository.findById(dto.getOrganizerId()).orElseThrow(
-        () -> new NotFoundException("tournament_organizer_id_not_found",List.of(dto.getOrganizerId().toString()))
-    );
+    UserEntity organizer;
+    DistrictEntity district;
+
+    if (currentUserService.isSuperAdmin()) {
+      organizer = userRepository.findById(dto.getOrganizerId()).orElseThrow(
+          () -> new NotFoundException("tournament_organizer_id_not_found",
+              List.of(String.valueOf(dto.getOrganizerId())))
+      );
+      district = dto.getDistrictId() == null ? null
+          : districtRepository.findById(dto.getDistrictId())
+              .orElseThrow(() -> new NotFoundException("district_not_found",
+                  List.of(dto.getDistrictId().toString())));
+    } else if (currentUserService.isDistrictAdmin() || currentUserService.isOwner()) {
+      organizer = currentUserService.getCurrentUser();
+      district = organizer.getDistrict();
+      if (district == null) {
+        throw new ForbiddenException("CURRENT_USER_HAS_NO_DISTRICT");
+      }
+    } else {
+      throw new ForbiddenException("INSUFFICIENT_ROLE_TO_CREATE_TOURNAMENT");
+    }
+
     var tournamentEntity = mapper.toEntity(dto);
     tournamentEntity.setOrganizer(organizer);
+    tournamentEntity.setDistrict(district);
     var savedTournament = tournamentRepository.save(tournamentEntity);
     var response = mapper.toDto(savedTournament);
     response.setTeamApplied(0L);
@@ -64,7 +93,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     // sportType mosligini tekshirish
     if (team.getSportType() != tournament.getSportType()) {
-      throw new NotFoundException("sport_type_mismatch", List.of(team.getSportType().name()));
+      throw new BadRequestException("SPORT_TYPE_MISMATCH", List.of(team.getSportType().name()));
     }
 
     // limit tekshirish
@@ -72,14 +101,14 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentTeamRepository.countByTournamentId(tournamentId);
 
     if (currentTeams >= tournament.getMaxTeams()) {
-      throw new NotFoundException("tournament_is_full", List.of(tournamentId.toString()));
+      throw new ConflictException("TOURNAMENT_IS_FULL", List.of(tournamentId.toString()));
     }
 
     // oldin qo‘shilganmi?
     if (tournamentTeamRepository
         .existsByTournamentIdAndTeamId(tournamentId, teamId)) {
 
-      throw new NotFoundException("team_already_registered", List.of(teamId.toString()));
+      throw new ConflictException("TEAM_ALREADY_REGISTERED", List.of(teamId.toString()));
     }
 
     TournamentTeamEntity entity = new TournamentTeamEntity();

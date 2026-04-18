@@ -21,4 +21,9 @@ public class AdminUserController implements AdminUserApi {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(BaseResponse.ok(created));
   }
+
+  @Override
+  public ResponseEntity<BaseResponse<String>> generatePassword() {
+    return ResponseEntity.ok(BaseResponse.ok(userService.generateStaffPassword()));
+  }
 }

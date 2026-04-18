@@ -1,11 +1,9 @@
 package com.example.bron.auth.security.refresh;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.example.bron.exception.UnauthorizedException;
 
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class RefreshTokenException extends RuntimeException {
-  public RefreshTokenException(String message) {
-    super(message);
+public class RefreshTokenException extends UnauthorizedException {
+  public RefreshTokenException(String code) {
+    super(code);
   }
 }

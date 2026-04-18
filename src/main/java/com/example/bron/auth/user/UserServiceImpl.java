@@ -1,6 +1,7 @@
 package com.example.bron.auth.user;
 
 import com.example.bron.auth.otp.EskizSmsService;
+import com.example.bron.auth.security.CurrentUserService;
 import com.example.bron.auth.user.dto.AssignRoleRequestDto;
 import com.example.bron.auth.user.dto.CreateStaffUserDto;
 import com.example.bron.auth.user.dto.UserDTO;
@@ -12,7 +13,10 @@ import com.example.bron.auth.user.role.dto.RoleResponseDto;
 import com.example.bron.coach.CoachEntity;
 import com.example.bron.coach.CoachRepository;
 import com.example.bron.enums.StaffRole;
+import com.example.bron.exception.ConflictException;
+import com.example.bron.exception.ForbiddenException;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.location.DistrictEntity;
 import com.example.bron.location.DistrictRepository;
 import com.example.bron.stadium.StadiumRepository;
 import jakarta.transaction.Transactional;
@@ -42,6 +46,7 @@ public class UserServiceImpl implements UserService {
   private final UserMapper mapper;
   private final RoleMapper roleMapper;
   private final PasswordEncoder passwordEncoder;
+  private final CurrentUserService currentUserService;
 
   @Override
   public UserDTO create(UserRequestDto dto) {
@@ -59,39 +64,27 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDTO createStaff(CreateStaffUserDto dto) {
     if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-      throw new NotFoundException("username_already_exists", List.of(dto.getUsername()));
+      throw new ConflictException("USERNAME_ALREADY_EXISTS", List.of(dto.getUsername()));
     }
+
+    DistrictEntity targetDistrict = resolveTargetDistrictForStaff(dto);
 
     RoleEntity role = roleRepository.findByName(dto.getRole().getRoleName())
         .orElseThrow(() -> new NotFoundException("role_not_found",
             List.of(dto.getRole().getRoleName())));
 
-    String rawPassword = generatePassword();
-
     UserEntity user = new UserEntity();
     user.setUsername(dto.getUsername());
     user.setFullName(dto.getFullName());
     user.setPhone(dto.getPhone());
-    user.setPasswordHash(passwordEncoder.encode(rawPassword));
+    user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
     user.setCreatedAt(LocalDateTime.now());
     user.getRoles().add(role);
-
-    if (dto.getDistrictId() != null) {
-      var district = districtRepository.findById(dto.getDistrictId())
-          .orElseThrow(() -> new NotFoundException("district_not_found",
-              List.of(dto.getDistrictId().toString())));
-      user.setDistrict(district);
-    }
+    user.setDistrict(targetDistrict);
 
     UserEntity saved = userRepository.save(user);
 
-    if (dto.getRole() == StaffRole.OWNER && dto.getStadiumId() != null) {
-      var stadium = stadiumRepository.findById(dto.getStadiumId())
-          .orElseThrow(() -> new NotFoundException("stadium_not_found",
-              List.of(dto.getStadiumId().toString())));
-      stadium.setOwner(saved);
-      stadiumRepository.save(stadium);
-    } else if (dto.getRole() == StaffRole.COACH) {
+    if (dto.getRole() == StaffRole.COACH) {
       CoachEntity coach = new CoachEntity();
       coach.setUser(saved);
       coachRepository.save(coach);
@@ -145,7 +138,7 @@ public class UserServiceImpl implements UserService {
     Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(roleDto.getRoleIds()));
 
     if (roles.size() != roleDto.getRoleIds().size()) {
-      throw new NotFoundException("one_or_more_roles_not_found",List.of(roleDto.getRoleIds().toString()));
+      throw new NotFoundException("ROLE_NOT_FOUND", List.of(roleDto.getRoleIds().toString()));
     }
 
     user.getRoles().addAll(roles);
@@ -157,7 +150,7 @@ public class UserServiceImpl implements UserService {
     var user = getFindById(userId);
 
     var role = roleRepository.findById(roleId)
-        .orElseThrow(() -> new RuntimeException("Role not found"));
+        .orElseThrow(() -> new NotFoundException("ROLE_NOT_FOUND", List.of(roleId.toString())));
 
     user.getRoles().remove(role);
   }
@@ -169,7 +162,34 @@ public class UserServiceImpl implements UserService {
     return roles.stream().map(roleMapper::toDto).toList();
   }
 
-  private String generatePassword() {
+  private DistrictEntity resolveTargetDistrictForStaff(CreateStaffUserDto dto) {
+    StaffRole requestedRole = dto.getRole();
+
+    if (currentUserService.isSuperAdmin()) {
+      if (dto.getDistrictId() == null) {
+        return null;
+      }
+      return districtRepository.findById(dto.getDistrictId())
+          .orElseThrow(() -> new NotFoundException("district_not_found",
+              List.of(dto.getDistrictId().toString())));
+    }
+
+    if (currentUserService.isDistrictAdmin()) {
+      if (requestedRole == StaffRole.SUPER_ADMIN || requestedRole == StaffRole.DISTRICT_ADMIN) {
+        throw new ForbiddenException("DISTRICT_ADMIN_CANNOT_CREATE_ADMIN");
+      }
+      DistrictEntity own = currentUserService.getCurrentUser().getDistrict();
+      if (own == null) {
+        throw new ForbiddenException("CURRENT_ADMIN_HAS_NO_DISTRICT");
+      }
+      return own;
+    }
+
+    throw new ForbiddenException("INSUFFICIENT_ROLE_TO_CREATE_STAFF");
+  }
+
+  @Override
+  public String generateStaffPassword() {
     StringBuilder sb = new StringBuilder(GENERATED_PASSWORD_LENGTH);
     for (int i = 0; i < GENERATED_PASSWORD_LENGTH; i++) {
       sb.append(PASSWORD_ALPHABET.charAt(SECURE_RANDOM.nextInt(PASSWORD_ALPHABET.length())));

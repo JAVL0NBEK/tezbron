@@ -1,6 +1,8 @@
 package com.example.bron.match;
 
 import com.example.bron.enums.ParticipantStatus;
+import com.example.bron.exception.BadRequestException;
+import com.example.bron.exception.ConflictException;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.dto.JoinMatchRequestDto;
 import com.example.bron.match.dto.MatchRequestDto;
@@ -68,11 +70,11 @@ public class MatchServiceImpl implements MatchService{
     var participant = userRepository.findById(dto.userId()).orElseThrow(
         () -> new NotFoundException("participant_not_found",List.of(dto.userId().toString())));
     if (matchParticipantRepository.countByMatchId(matchId) >= match.getMaxPlayers()) {
-      throw new NotFoundException("match_is_full",List.of(matchId.toString()));
+      throw new ConflictException("MATCH_IS_FULL",List.of(matchId.toString()));
     }
 
     if (matchParticipantRepository.existsByMatchIdAndUserId(matchId,dto.userId())) {
-      throw new NotFoundException("match_is_user_already_exist",List.of(matchId.toString()));
+      throw new ConflictException("USER_ALREADY_IN_MATCH",List.of(matchId.toString()));
     }
 
     var matchParticipant = new MatchParticipantEntity();
@@ -112,7 +114,7 @@ public class MatchServiceImpl implements MatchService{
         .orElseThrow(() -> new NotFoundException("participant_not_in_match",List.of(matchId.toString())));
 
     if (!match.getOrganizer().getId().equals(userId)) {
-      throw new NotFoundException("organizer_cannot_leave_leave",List.of(userId.toString()));
+      throw new BadRequestException("ORGANIZER_CANNOT_LEAVE_MATCH",List.of(userId.toString()));
     }
 
     matchParticipantRepository.delete(matchParticipant);

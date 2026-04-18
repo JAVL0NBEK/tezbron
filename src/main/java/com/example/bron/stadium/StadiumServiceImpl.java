@@ -1,9 +1,12 @@
 package com.example.bron.stadium;
 
+import com.example.bron.auth.security.CurrentUserService;
+import com.example.bron.auth.user.UserEntity;
 import com.example.bron.booking.BookingEntity;
 import com.example.bron.booking.BookingRepository;
 import com.example.bron.enums.SlotStatus;
 import com.example.bron.enums.StadiumDuration;
+import com.example.bron.exception.ForbiddenException;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.location.DistrictRepository;
 import com.example.bron.location.RegionRepository;
@@ -35,16 +38,33 @@ public class StadiumServiceImpl implements StadiumService {
     private final UserRepository userRepository;
     private final RegionRepository regionRepository;
     private final DistrictRepository districtRepository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public StadiumResponseDto create(StadiumRequestDto dto) {
-        var owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+        UserEntity owner;
+        Long targetDistrictId;
+
+        if (currentUserService.isOwner()
+            && !currentUserService.isSuperAdmin()
+            && !currentUserService.isDistrictAdmin()) {
+          owner = currentUserService.getCurrentUser();
+          targetDistrictId = owner.getDistrict() == null ? null : owner.getDistrict().getId();
+          if (targetDistrictId == null) {
+            throw new ForbiddenException("OWNER_HAS_NO_DISTRICT");
+          }
+        } else {
+          currentUserService.requireSameDistrict(dto.getDistrictId());
+          owner = userRepository.findById(dto.getOwnerId())
+              .orElseThrow(() -> new NotFoundException("owner_not_found",
+                  List.of(dto.getOwnerId().toString())));
+          targetDistrictId = dto.getDistrictId();
+        }
 
         var region = regionRepository.findById(dto.getRegionId())
                 .orElseThrow(() -> new NotFoundException("region_not_found",List.of(dto.getRegionId().toString())));
-      var district = districtRepository.findById(dto.getDistrictId())
-          .orElseThrow(() -> new NotFoundException("district_not_found",List.of(dto.getDistrictId().toString())));
+      var district = districtRepository.findById(targetDistrictId)
+          .orElseThrow(() -> new NotFoundException("district_not_found",List.of(targetDistrictId.toString())));
 
         var stadium = mapper.toEntity(dto);
         stadium.setOwner(owner);
@@ -59,6 +79,12 @@ public class StadiumServiceImpl implements StadiumService {
     @Override
     public StadiumResponseDto update(Long id, StadiumRequestDto dto) {
         var entity = getFindById(id);
+        currentUserService.requireOwnerOrDistrictScope(
+            entity.getOwner() == null ? null : entity.getOwner().getId(),
+            entity.getDistrict() == null ? null : entity.getDistrict().getId());
+        if (dto.getDistrictId() != null && !currentUserService.isOwner()) {
+          currentUserService.requireSameDistrict(dto.getDistrictId());
+        }
         var owner = userRepository.findById(dto.getOwnerId())
           .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
         mapper.updateEntity(entity, dto);
@@ -76,6 +102,10 @@ public class StadiumServiceImpl implements StadiumService {
 
     @Override
     public void delete(Long id) {
+        var entity = getFindById(id);
+        currentUserService.requireOwnerOrDistrictScope(
+            entity.getOwner() == null ? null : entity.getOwner().getId(),
+            entity.getDistrict() == null ? null : entity.getDistrict().getId());
         stadiumRepository.deleteById(id);
     }
 

@@ -10,6 +10,7 @@ import org.mapstruct.MappingConstants;
 public interface TournamentMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "organizer", ignore = true)
+  @Mapping(target = "district", ignore = true)
   TournamentEntity toEntity(TournamentRequestDto dto);
 
   @Mapping(source = "organizer.id", target = "organizerId")

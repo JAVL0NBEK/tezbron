@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "Admin User Management", description = "SUPER_ADMIN tomonidan xodimlar (admin/owner/coach) yaratish")
 public interface AdminUserApi {
 
-  @PreAuthorize("hasRole('SUPER_ADMIN')")
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN')")
   @PostMapping
-  @Operation(summary = "Admin/Owner/Coach hisobini yaratish va SMS orqali parol yuborish")
+  @Operation(summary = "Admin/Owner/Coach hisobini yaratish (parol DTO orqali yuboriladi)")
   ResponseEntity<BaseResponse<UserDTO>> createStaff(@Valid @RequestBody CreateStaffUserDto dto);
+
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN')")
+  @GetMapping("/generate-password")
+  @Operation(summary = "Staff uchun tasodifiy parol generatsiya qilish")
+  ResponseEntity<BaseResponse<String>> generatePassword();
 }

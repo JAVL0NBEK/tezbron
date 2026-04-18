@@ -3,6 +3,7 @@ package com.example.bron.tournament;
 import com.example.bron.enums.SportType;
 import com.example.bron.enums.TournamentStatus;
 import com.example.bron.auth.user.UserEntity;
+import com.example.bron.location.DistrictEntity;
 import com.example.bron.stadium.dto.LocationDto;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -29,6 +30,10 @@ public class TournamentEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
     private UserEntity organizer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id")
+    private DistrictEntity district;
 
     private LocalDate startDate;
     private LocalDate endDate;

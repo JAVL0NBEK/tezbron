@@ -6,6 +6,7 @@ import com.example.bron.tournament.dto.TournamentResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Tournament Management APIs", description = "Endpoints for managing tournament")
 public interface TournamentApi {
 
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
   @PostMapping("/create")
   ResponseEntity<BaseResponse<TournamentResponseDto>> create(@RequestBody TournamentRequestDto tournamentRequestDto);
 

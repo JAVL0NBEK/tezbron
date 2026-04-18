@@ -32,13 +32,13 @@ public class RefreshTokenService {
   @Transactional(readOnly = true)
   public RefreshTokenEntity verify(String token) {
     RefreshTokenEntity entity = repository.findByToken(token)
-        .orElseThrow(() -> new RefreshTokenException("Refresh token topilmadi"));
+        .orElseThrow(() -> new RefreshTokenException("REFRESH_TOKEN_NOT_FOUND"));
 
     if (entity.isRevoked()) {
-      throw new RefreshTokenException("Refresh token bekor qilingan");
+      throw new RefreshTokenException("REFRESH_TOKEN_REVOKED");
     }
     if (entity.getExpiryDate().isBefore(Instant.now())) {
-      throw new RefreshTokenException("Refresh token muddati tugagan, qayta login qiling");
+      throw new RefreshTokenException("REFRESH_TOKEN_EXPIRED");
     }
     return entity;
   }

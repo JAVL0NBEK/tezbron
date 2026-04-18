@@ -1,7 +1,7 @@
 package com.example.bron.auth.dto;
 
 import com.example.bron.enums.LoginStatus;
-import com.example.bron.location.DistrictEntity;
+import com.example.bron.location.dto.DistrictResponseDto;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class LoginResponseDto {
   private Long accessTokenExpiresIn;  // sekundda
   private Long refreshTokenExpiresIn; // sekundda
 
-  private DistrictEntity district;
+  private DistrictResponseDto district;
 
   private String phone;
   private String fullName;

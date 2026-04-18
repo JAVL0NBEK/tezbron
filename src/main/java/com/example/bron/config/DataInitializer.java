@@ -22,6 +22,7 @@ public class DataInitializer implements CommandLineRunner {
 
   private static final List<String> DEFAULT_ROLES = List.of(
       SUPER_ADMIN_ROLE,
+      "ROLE_DISTRICT_ADMIN",
       "ROLE_OWNER",
       "ROLE_COACH",
       "ROLE_PLAYER"
