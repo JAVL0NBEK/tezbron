@@ -1,6 +1,7 @@
 package com.example.bron.tournament;
 
 import com.example.bron.common.BaseResponse;
+import com.example.bron.tournament.dto.JoinedTeamDto;
 import com.example.bron.tournament.dto.TournamentRequestDto;
 import com.example.bron.tournament.dto.TournamentResponseDto;
 import java.util.List;
@@ -38,5 +39,11 @@ public class TournamentController implements TournamentApi {
       Long teamId) {
     tournamentService.addTeamToTournament(tournamentId, teamId);
     return ResponseEntity.ok(BaseResponse.noContent("Success"));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<List<JoinedTeamDto>>> getTeamJoinedTour(Long tournamentId) {
+    var teams = tournamentService.getTeamJoinedTour(tournamentId);
+    return ResponseEntity.ok(BaseResponse.ok(teams));
   }
 }

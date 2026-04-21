@@ -1,5 +1,6 @@
 package com.example.bron.tournament;
 
+import com.example.bron.tournament.dto.JoinedTeamDto;
 import com.example.bron.tournament.dto.TournamentRequestDto;
 import com.example.bron.tournament.dto.TournamentResponseDto;
 import java.util.List;
@@ -12,5 +13,7 @@ public interface TournamentService {
   List<TournamentResponseDto> getAll(TournamentFilterParams filterParams);
   void addTeamToTournament(Long tournamentId,
       Long teamId);
+
+  List<JoinedTeamDto> getTeamJoinedTour(Long tournamentId);
 
 }
