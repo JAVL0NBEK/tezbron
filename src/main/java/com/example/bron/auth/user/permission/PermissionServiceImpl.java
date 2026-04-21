@@ -2,7 +2,7 @@ package com.example.bron.auth.user.permission;
 
 import com.example.bron.auth.user.permission.dto.PermissionRequestDto;
 import com.example.bron.auth.user.permission.dto.PermissionResponseDto;
-import com.example.bron.exception.NotFoundException;
+import com.example.bron.exception.ConflictException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class PermissionServiceImpl implements PermissionService {
   @Override
   public PermissionResponseDto create(PermissionRequestDto dto) {
     if (repository.existsByName(dto.getName())) {
-      throw new NotFoundException("Permission already exists", List.of(dto.getName()));
+      throw new ConflictException("PERMISSION_ALREADY_EXISTS", List.of(dto.getName()));
     }
     var entity = mapper.toEntity(dto);
     return mapper.toDto(repository.save(entity));

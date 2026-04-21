@@ -4,6 +4,7 @@ import com.example.bron.auth.user.UserRepository;
 import com.example.bron.auth.user.permission.PermissionRepository;
 import com.example.bron.auth.user.role.dto.RoleRequestDto;
 import com.example.bron.auth.user.role.dto.RoleResponseDto;
+import com.example.bron.exception.ConflictException;
 import com.example.bron.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -22,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
   @Override
   public RoleResponseDto createRole(RoleRequestDto dto) {
     if (roleRepository.existsByName(dto.getName())) {
-      throw new NotFoundException("Role already exists", List.of(dto.getName()));
+      throw new ConflictException("ROLE_ALREADY_EXISTS", List.of(dto.getName()));
     }
     return roleMapper.toDto(roleRepository.save(roleMapper.toEntity(dto)));
   }

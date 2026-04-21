@@ -1,11 +1,14 @@
 package com.example.bron.auth.user;
 
 import com.example.bron.auth.dto.LoginResponseDto;
+import com.example.bron.auth.user.role.RoleEntity;
 import com.example.bron.stadium.dto.LocationDto;
 import com.example.bron.auth.user.dto.UserDTO;
 import com.example.bron.auth.user.dto.UserRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,7 +31,13 @@ public interface UserMapper {
 //  @Mapping(target = "permissions", expression = "java(user.getRoles().stream().flatMap(r -> r.getPermissions().stream()).map(p -> p.getName()).collect(Collectors.toSet()))")
   UserDTO toDto(UserEntity entity);
 
+  @Mapping(target = "roles", source = "roles", qualifiedByName = "rolesToNames")
   LoginResponseDto toLoginDto(UserEntity entity);
+
+  @Named("rolesToNames")
+  default Set<String> rolesToNames(Set<RoleEntity> roles) {
+    return roles == null ? Set.of() : roles.stream().map(RoleEntity::getName).collect(Collectors.toSet());
+  }
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "id", ignore = true)

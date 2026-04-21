@@ -10,6 +10,7 @@ import java.util.List;
 public interface UserService {
   UserDTO create(UserRequestDto dto);
   UserDTO createStaff(CreateStaffUserDto dto);
+  String generateStaffPassword();
   UserDTO update(Long id, UserRequestDto dto);
   void delete(Long id);
   UserDTO getById(Long id);

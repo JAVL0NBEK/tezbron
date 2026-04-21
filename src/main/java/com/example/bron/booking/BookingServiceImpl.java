@@ -3,6 +3,8 @@ package com.example.bron.booking;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
+import com.example.bron.exception.BadRequestException;
+import com.example.bron.exception.ConflictException;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.MatchRepository;
 import com.example.bron.notification.enums.NotificationTemplate;
@@ -30,11 +32,11 @@ public class BookingServiceImpl implements BookingService {
   @Override
   public BookingResponseDto createBooking(BookingRequestDto requestDto) {
     if (!requestDto.getEndTime().isAfter(requestDto.getStartTime())) {
-      throw new NotFoundException("booking_invalid_time_range", List.of());
+      throw new BadRequestException("BOOKING_INVALID_TIME_RANGE");
     }
 
     if (requestDto.getStartTime().isBefore(LocalDateTime.now())) {
-      throw new NotFoundException("booking_time_in_past", List.of());
+      throw new BadRequestException("BOOKING_TIME_IN_PAST");
     }
 
     var user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
@@ -54,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
     );
 
     if (exists) {
-      throw new NotFoundException("booking_time_already_taken", List.of("exists"));
+      throw new ConflictException("BOOKING_TIME_ALREADY_TAKEN", List.of("exists"));
     }
 
     var entity = bookingMapper.toEntity(requestDto);

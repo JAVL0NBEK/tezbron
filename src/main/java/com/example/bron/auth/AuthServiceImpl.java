@@ -15,10 +15,11 @@ import com.example.bron.auth.user.UserEntity;
 import com.example.bron.auth.user.UserMapper;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.enums.LoginStatus;
+import com.example.bron.exception.BadRequestException;
 import com.example.bron.exception.NotFoundException;
+import com.example.bron.exception.UnauthorizedException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -119,14 +120,14 @@ public class AuthServiceImpl implements AuthService {
   public void changePassword(ChangePasswordRequestDto request) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof UserDetails principal)) {
-      throw new AccessDeniedException("Not authenticated");
+      throw new UnauthorizedException("UNAUTHENTICATED");
     }
 
     UserEntity user = userRepository.findByUsername(principal.getUsername())
         .orElseThrow(() -> new NotFoundException("user_not_found", List.of(principal.getUsername())));
 
     if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
-      throw new AccessDeniedException("Eski parol noto'g'ri");
+      throw new BadRequestException("OLD_PASSWORD_INVALID");
     }
 
     user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));

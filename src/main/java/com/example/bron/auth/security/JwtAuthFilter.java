@@ -1,5 +1,6 @@
 package com.example.bron.auth.security;
 
+import com.example.bron.common.BaseResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -7,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -63,28 +63,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       }
 
     } catch (ExpiredJwtException e) {
-      SecurityContextHolder.clearContext();
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      objectMapper.writeValue(response.getOutputStream(), Map.of(
-          "success", false,
-          "code", "TOKEN_EXPIRED",
-          "message", "Access token muddati tugagan. /api/auth/refresh orqali yangilang."
-      ));
+      writeError(response, "TOKEN_EXPIRED");
       return;
 
     } catch (Exception e) {
-      SecurityContextHolder.clearContext();
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      objectMapper.writeValue(response.getOutputStream(), Map.of(
-          "success", false,
-          "code", "TOKEN_INVALID",
-          "message", "Token yaroqsiz"
-      ));
+      writeError(response, "TOKEN_INVALID");
       return;
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private void writeError(HttpServletResponse response, String code) throws IOException {
+    SecurityContextHolder.clearContext();
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    objectMapper.writeValue(response.getOutputStream(),
+        BaseResponse.error(code, code, null));
   }
 }

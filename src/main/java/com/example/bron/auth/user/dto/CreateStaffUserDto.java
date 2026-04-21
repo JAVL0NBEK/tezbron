@@ -16,10 +16,11 @@ public class CreateStaffUserDto {
   @NotBlank
   private String phone;
 
+  @NotBlank
+  private String password;
+
   @NotNull
   private StaffRole role;
-
-  private Long stadiumId;
 
   private Long districtId;
 }

@@ -2,6 +2,8 @@ package com.example.bron.team;
 
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.enums.Role;
+import com.example.bron.exception.BadRequestException;
+import com.example.bron.exception.ConflictException;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.team.dto.JoinTeamRequest;
 import com.example.bron.team.dto.TeamRequestDto;
@@ -33,11 +35,11 @@ public class TeamServiceImpl implements TeamService {
         new NotFoundException("team_not_found",List.of(teamId.toString())));
 
     if (teamMemberRepository.countByTeamId(teamId) >= team.getMaxMembers()) {
-      throw new NotFoundException("team_is_full",List.of(teamId.toString()));
+      throw new ConflictException("TEAM_IS_FULL",List.of(teamId.toString()));
     }
 
     if (teamMemberRepository.existsByTeamIdAndUserId(teamId, dto.userId())) {
-      throw new NotFoundException("user_already_in_team",List.of(dto.userId().toString()));
+      throw new ConflictException("USER_ALREADY_IN_TEAM",List.of(dto.userId().toString()));
     }
 
     var user = userRepository.findById(dto.userId())
@@ -62,7 +64,7 @@ public class TeamServiceImpl implements TeamService {
         .orElseThrow(() -> new NotFoundException("user_not_in_team",List.of(dto.userId().toString())));
 
     if (member.getRole() == Role.CAPTAIN) {
-      throw new NotFoundException("captain_cannot_leave_team",List.of(dto.userId().toString()));
+      throw new BadRequestException("CAPTAIN_CANNOT_LEAVE_TEAM",List.of(dto.userId().toString()));
     }
 
     teamMemberRepository.delete(member);

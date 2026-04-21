@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +20,11 @@ import java.util.List;
 @Tag(name = "Stadium Management APIs", description = "Endpoints for managing stadiums")
 public interface StadiumApi {
 
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
   @PostMapping("/create")
   ResponseEntity<BaseResponse<StadiumResponseDto>> create(@RequestBody StadiumRequestDto stadiumRequestDto);
 
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
   @PutMapping("/{id}")
   ResponseEntity<BaseResponse<StadiumResponseDto>> update(@PathVariable Long id,
       @RequestBody StadiumRequestDto dto);
@@ -36,6 +39,7 @@ public interface StadiumApi {
   @GetMapping
   ResponseEntity<BaseResponse<Page<StadiumResponseDto>>> getAll(StadiumFilterParams filterParams, Pageable pageable);
 
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
   @DeleteMapping("/{id}")
   ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id);
 

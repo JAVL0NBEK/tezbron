@@ -1,8 +1,10 @@
 package com.example.bron.location.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class DistrictResponseDto {
   private Long id;
   private String name;

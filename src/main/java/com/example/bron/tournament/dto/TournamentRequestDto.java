@@ -22,6 +22,8 @@ public class TournamentRequestDto {
 
   private Long organizerId;
 
+  private Long districtId;
+
   private LocalDate startDate;
   private LocalDate endDate;
 
