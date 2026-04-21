@@ -25,6 +25,8 @@ public class MatchResponseDto {
   private MatchStatus status;
   private Object location;
   private SportType sportType;
+  private List<Long> participantUserIds;
+  private Integer participantCount;
 
   public MatchResponseDto(Long id, String title, Long organizerId, Long stadiumId,
       LocalDateTime dateTime, Duration duration, Integer maxPlayers, Integer currentPlayers,

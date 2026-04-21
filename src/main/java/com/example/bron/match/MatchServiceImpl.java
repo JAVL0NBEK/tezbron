@@ -13,6 +13,7 @@ import com.example.bron.stadium.StadiumRepository;
 import com.example.bron.auth.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,24 @@ public class MatchServiceImpl implements MatchService{
 
   @Override
   public List<MatchResponseDto> getAll(MatchFilterParams filterParams) {
-    return matchRepository.getAll(filterParams);
+    var matches = matchRepository.getAll(filterParams);
+    if (matches.isEmpty()) {
+      return matches;
+    }
+    var matchIds = matches.stream().map(MatchResponseDto::getId).toList();
+    var participantsByMatchId = matchParticipantRepository.findParticipantUserIdsByMatchIds(matchIds)
+        .stream()
+        .collect(Collectors.groupingBy(
+            MatchParticipantRepository.MatchParticipantProjection::getMatchId,
+            Collectors.mapping(
+                MatchParticipantRepository.MatchParticipantProjection::getUserId,
+                Collectors.toList())));
+    for (var match : matches) {
+      var userIds = participantsByMatchId.getOrDefault(match.getId(), List.of());
+      match.setParticipantUserIds(userIds);
+      match.setParticipantCount(userIds.size());
+    }
+    return matches;
   }
 
   @Override
