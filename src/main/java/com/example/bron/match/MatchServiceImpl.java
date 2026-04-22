@@ -56,7 +56,14 @@ public class MatchServiceImpl implements MatchService{
   public MatchResponseDto getById(Long id) {
     var match = getFindById(id);
     match.setCurrentPlayers(match.getParticipants().size());
-    return mapper.toDto(match);
+    var dto = mapper.toDto(match);
+    var userIds = matchParticipantRepository.findParticipantUserIdsByMatchIds(List.of(id))
+        .stream()
+        .map(MatchParticipantRepository.MatchParticipantProjection::getUserId)
+        .toList();
+    dto.setParticipantUserIds(userIds);
+    dto.setParticipantCount(userIds.size());
+    return dto;
   }
 
   @Override

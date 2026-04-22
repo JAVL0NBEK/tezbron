@@ -1,6 +1,7 @@
 package com.example.bron.tournament;
 
 import com.example.bron.common.BaseResponse;
+import com.example.bron.tournament.dto.JoinedTeamDto;
 import com.example.bron.tournament.dto.TournamentRequestDto;
 import com.example.bron.tournament.dto.TournamentResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,5 +34,8 @@ public interface TournamentApi {
       @RequestParam Long tournamentId,
       @RequestParam Long teamId
   );
+
+  @GetMapping("/joined-teams/{tournamentId}")
+  ResponseEntity<BaseResponse<List<JoinedTeamDto>>> getTeamJoinedTour(@PathVariable Long tournamentId);
 
 }

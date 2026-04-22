@@ -13,6 +13,7 @@ import com.example.bron.location.DistrictRepository;
 import com.example.bron.notification.enums.NotificationTemplate;
 import com.example.bron.notification.event.TournamentEvent;
 import com.example.bron.team.TeamRepository;
+import com.example.bron.tournament.dto.JoinedTeamDto;
 import com.example.bron.tournament.dto.TournamentRequestDto;
 import com.example.bron.tournament.dto.TournamentResponseDto;
 import java.time.LocalDateTime;
@@ -127,5 +128,31 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.getName()
         ))
     );
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<JoinedTeamDto> getTeamJoinedTour(Long tournamentId) {
+    if (!tournamentRepository.existsById(tournamentId)) {
+      throw new NotFoundException("tournament_not_found", List.of(tournamentId.toString()));
+    }
+
+    return tournamentTeamRepository.getTeamJoinedTour(tournamentId).stream()
+        .map(team -> {
+          var memberIds = team.getMembers() == null ? List.<Long>of()
+              : team.getMembers().stream()
+                  .map(m -> m.getUser().getId())
+                  .toList();
+
+          return new JoinedTeamDto(
+              team.getId(),
+              team.getName(),
+              team.getSportType(),
+              team.getDescription(),
+              team.getCreatedAt(),
+              memberIds
+          );
+        })
+        .toList();
   }
 }
