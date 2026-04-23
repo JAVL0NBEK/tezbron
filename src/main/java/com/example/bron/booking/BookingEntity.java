@@ -49,4 +49,11 @@ public class BookingEntity {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    private String cancelReason;
+
+    private LocalDateTime cancelledAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cancelled_by_user_id")
+    private UserEntity cancelledBy;
 }

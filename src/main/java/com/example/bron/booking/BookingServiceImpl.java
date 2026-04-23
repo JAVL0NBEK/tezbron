@@ -1,15 +1,20 @@
 package com.example.bron.booking;
 
+import com.example.bron.auth.security.CurrentUserService;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
+import com.example.bron.booking.dto.CancelBookingRequestDto;
+import com.example.bron.enums.BookingStatus;
 import com.example.bron.exception.BadRequestException;
 import com.example.bron.exception.ConflictException;
+import com.example.bron.exception.ForbiddenException;
 import com.example.bron.exception.NotFoundException;
 import com.example.bron.match.MatchRepository;
 import com.example.bron.notification.enums.NotificationTemplate;
 import com.example.bron.notification.event.BookingEvent;
 import com.example.bron.stadium.StadiumRepository;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +32,9 @@ public class BookingServiceImpl implements BookingService {
   private final MatchRepository matchRepository;
   private final BookingMapper bookingMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final CurrentUserService currentUserService;
+
+  private static final long MIN_CANCEL_HOURS_BEFORE_START = 1;
 
   @Transactional
   @Override
@@ -90,6 +98,52 @@ public class BookingServiceImpl implements BookingService {
   public BookingResponseDto updateBooking(Long id, BookingRequestDto bookingRequestDto) {
 //    var entity = bookingRepository.findById(id);
     return null;
+  }
+
+  @Transactional
+  @Override
+  public BookingResponseDto cancelBooking(Long id, CancelBookingRequestDto dto) {
+    var booking = bookingEntity(id);
+
+    if (booking.getStatus() == BookingStatus.CANCELLED) {
+      throw new ConflictException("BOOKING_ALREADY_CANCELLED", List.of(id.toString()));
+    }
+
+    var currentUser = currentUserService.getCurrentUser();
+    boolean isAdmin = currentUserService.isSuperAdmin()
+        || currentUserService.isDistrictAdmin();
+    boolean isOwner = booking.getUser() != null
+        && booking.getUser().getId().equals(currentUser.getId());
+
+    if (!isAdmin && !isOwner) {
+      throw new ForbiddenException("BOOKING_CANCEL_NOT_ALLOWED");
+    }
+
+    var now = LocalDateTime.now();
+    if (!booking.getStartTime().isAfter(now)) {
+      throw new BadRequestException("BOOKING_ALREADY_STARTED");
+    }
+
+    long hoursLeft = Duration.between(now, booking.getStartTime()).toHours();
+    if (hoursLeft < MIN_CANCEL_HOURS_BEFORE_START) {
+      throw new BadRequestException("BOOKING_CANCEL_TOO_LATE",
+          List.of(String.valueOf(MIN_CANCEL_HOURS_BEFORE_START)));
+    }
+
+    booking.setStatus(BookingStatus.CANCELLED);
+    booking.setCancelReason(dto.getReason());
+    booking.setCancelledAt(now);
+    booking.setCancelledBy(currentUser);
+
+    var saved = bookingRepository.save(booking);
+
+    eventPublisher.publishEvent(new BookingEvent(
+        booking.getUser().getId(),
+        NotificationTemplate.BOOKING_CANCELLED,
+        booking.getStadium().getName()
+    ));
+
+    return bookingMapper.toDto(saved);
   }
 
   @Override

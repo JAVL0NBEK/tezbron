@@ -2,6 +2,7 @@ package com.example.bron.booking;
 
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
+import com.example.bron.booking.dto.CancelBookingRequestDto;
 import com.example.bron.common.BaseResponse;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +28,13 @@ public class BookingController implements BookingApi {
   public ResponseEntity<BaseResponse<BookingResponseDto>> updateBooking(Long id,
       BookingRequestDto bookingRequest) {
     var bookingResponse = bookingService.updateBooking(id, bookingRequest);
+    return ResponseEntity.ok(BaseResponse.ok(bookingResponse));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<BookingResponseDto>> cancelBooking(Long id,
+      CancelBookingRequestDto cancelRequest) {
+    var bookingResponse = bookingService.cancelBooking(id, cancelRequest);
     return ResponseEntity.ok(BaseResponse.ok(bookingResponse));
   }
 
