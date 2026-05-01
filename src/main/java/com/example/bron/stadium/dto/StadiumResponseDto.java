@@ -16,6 +16,7 @@ import java.util.List;
 public class StadiumResponseDto {
     private Long id;
     private String name;
+    private String phone;
     private Long ownerId;
     private String ownerName;
     private String description;
@@ -32,12 +33,13 @@ public class StadiumResponseDto {
     private LocalDateTime closeTime;
 
 
-  public StadiumResponseDto(Long id, String name, Long ownerId, String ownerName,
+  public StadiumResponseDto(Long id, String name, String phone, Long ownerId, String ownerName,
       String description,
       Object location, StadiumType type, StadiumDuration duration, Integer capacity,
       Double pricePerHour, Boolean isActive, String districtName, String regionName, Boolean isFavorite,LocalDateTime openTime, LocalDateTime closeTime) {
     this.id = id;
     this.name = name;
+    this.phone = phone;
     this.ownerId = ownerId;
     this.ownerName = ownerName;
     this.description = description;

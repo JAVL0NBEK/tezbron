@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class StadiumRequestDto {
     private String name;
+    private String phone;
     private Long ownerId;
     private Long regionId;
     private Long districtId;

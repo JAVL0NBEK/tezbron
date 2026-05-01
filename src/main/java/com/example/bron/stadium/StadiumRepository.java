@@ -21,6 +21,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     select new com.example.bron.stadium.dto.StadiumResponseDto(
         s.id,
         s.name,
+        s.phone,
         s.owner.id,
         s.owner.fullName,
         s.description,
@@ -64,6 +65,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     select new com.example.bron.stadium.dto.StadiumResponseDto(
         s.id,
         s.name,
+        s.phone,
         s.owner.id,
         s.owner.fullName,
         s.description,
@@ -103,6 +105,7 @@ public interface StadiumRepository extends JpaRepository<StadiumEntity, Long> {
     select new com.example.bron.stadium.dto.StadiumResponseDto(
         s.id,
         s.name,
+        s.phone,
         s.owner.id,
         s.owner.fullName,
         s.description,

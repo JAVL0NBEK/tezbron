@@ -31,6 +31,9 @@ public class StadiumEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "phone")
+    private String phone;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private UserEntity owner;

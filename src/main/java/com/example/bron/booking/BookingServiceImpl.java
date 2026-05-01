@@ -57,6 +57,10 @@ public class BookingServiceImpl implements BookingService {
             List.of(requestDto.getStadiumId().toString()))
     );
 
+    if (stadium.getOwner() == null) {
+      throw new BadRequestException("STADIUM_HAS_NO_OWNER_OFFLINE_BOOKING_ONLY");
+    }
+
     boolean exists = bookingRepository.existsOverlappingBooking(
         requestDto.getStadiumId(),
         requestDto.getStartTime(),

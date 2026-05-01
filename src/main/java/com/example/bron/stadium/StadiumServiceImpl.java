@@ -55,9 +55,13 @@ public class StadiumServiceImpl implements StadiumService {
           }
         } else {
           currentUserService.requireSameDistrict(dto.getDistrictId());
-          owner = userRepository.findById(dto.getOwnerId())
-              .orElseThrow(() -> new NotFoundException("owner_not_found",
-                  List.of(dto.getOwnerId().toString())));
+          if (dto.getOwnerId() != null) {
+            owner = userRepository.findById(dto.getOwnerId())
+                .orElseThrow(() -> new NotFoundException("owner_not_found",
+                    List.of(dto.getOwnerId().toString())));
+          } else {
+            owner = null;
+          }
           targetDistrictId = dto.getDistrictId();
         }
 
@@ -72,7 +76,9 @@ public class StadiumServiceImpl implements StadiumService {
         stadium.setDistrict(district);
         var saved =  stadiumRepository.save(stadium);
         var response = mapper.toDto(saved);
-        response.setOwnerName(owner.getUsername());
+        if (owner != null) {
+          response.setOwnerName(owner.getUsername());
+        }
         return response;
     }
 
@@ -85,13 +91,22 @@ public class StadiumServiceImpl implements StadiumService {
         if (dto.getDistrictId() != null && !currentUserService.isOwner()) {
           currentUserService.requireSameDistrict(dto.getDistrictId());
         }
-        var owner = userRepository.findById(dto.getOwnerId())
-          .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+        UserEntity owner = null;
+        if (dto.getOwnerId() != null) {
+          owner = userRepository.findById(dto.getOwnerId())
+            .orElseThrow(() -> new NotFoundException("owner_not_found",List.of(dto.getOwnerId().toString())));
+        }
         mapper.updateEntity(entity, dto);
+        if (owner != null) {
+          entity.setOwner(owner);
+        }
 
         StadiumEntity updated = stadiumRepository.save(entity);
         var response = mapper.toDto(updated);
-        response.setOwnerName(owner.getUsername());
+        UserEntity effectiveOwner = updated.getOwner();
+        if (effectiveOwner != null) {
+          response.setOwnerName(effectiveOwner.getUsername());
+        }
         return response;
     }
 
@@ -113,6 +128,11 @@ public class StadiumServiceImpl implements StadiumService {
     public List<StadiumResponseDto> getById(Long id, LocalDate date, StadiumDuration duration) {
       // 1) Asl stadionni topamiz (unda ownerId bor)
       var stadium = getFindById(id);
+
+      // Ownersiz stadion: slotlar generatsiya qilinmaydi, faqat ma'lumotlari qaytariladi
+      if (stadium.getOwner() == null) {
+        return List.of(mapper.toDto(stadium));
+      }
 
       // 2) OwnerId bo‘yicha barcha stadionlarni olish
       var filter = new StadiumFilterParams();
