@@ -50,6 +50,9 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDTO create(UserRequestDto dto) {
+    if (userRepository.existsByPhone(dto.getPhone())) {
+      throw new ConflictException("PHONE_ALREADY_EXISTS", List.of(dto.getPhone()));
+    }
     var user = mapper.toEntity(dto);
     user.setCreatedAt(LocalDateTime.now());
     user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
@@ -65,6 +68,10 @@ public class UserServiceImpl implements UserService {
   public UserDTO createStaff(CreateStaffUserDto dto) {
     if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
       throw new ConflictException("USERNAME_ALREADY_EXISTS", List.of(dto.getUsername()));
+    }
+
+    if (userRepository.existsByPhone(dto.getPhone())) {
+      throw new ConflictException("PHONE_ALREADY_EXISTS", List.of(dto.getPhone()));
     }
 
     DistrictEntity targetDistrict = resolveTargetDistrictForStaff(dto);

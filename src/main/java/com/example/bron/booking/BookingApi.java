@@ -2,12 +2,15 @@ package com.example.bron.booking;
 
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
+import com.example.bron.booking.dto.CancelBookingRequestDto;
 import com.example.bron.common.BaseResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +27,11 @@ public interface BookingApi {
 
   @PutMapping("/{id}")
   ResponseEntity<BaseResponse<BookingResponseDto>> updateBooking(@PathVariable Long id, @RequestBody BookingRequestDto bookingRequest);
+
+  @PatchMapping("/{id}/cancel")
+  ResponseEntity<BaseResponse<BookingResponseDto>> cancelBooking(
+      @PathVariable Long id,
+      @Valid @RequestBody CancelBookingRequestDto cancelRequest);
 
   @GetMapping("/by-stadion-id")
   ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBooking(
