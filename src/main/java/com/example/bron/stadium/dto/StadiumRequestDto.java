@@ -1,7 +1,6 @@
 package com.example.bron.stadium.dto;
 
 import com.example.bron.common.FileResponseDto;
-import com.example.bron.enums.Duration;
 import com.example.bron.enums.StadiumDuration;
 import com.example.bron.enums.StadiumType;
 import lombok.AllArgsConstructor;

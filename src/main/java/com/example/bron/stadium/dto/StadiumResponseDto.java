@@ -1,11 +1,8 @@
 package com.example.bron.stadium.dto;
 
-import com.example.bron.common.FileResponseDto;
 import com.example.bron.enums.StadiumDuration;
 import com.example.bron.enums.StadiumType;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
