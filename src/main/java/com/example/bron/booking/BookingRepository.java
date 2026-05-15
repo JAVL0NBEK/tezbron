@@ -65,6 +65,13 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   List<BookingEntity> findUpcomingBookings(LocalDateTime from, LocalDateTime to);
 
   @Query("""
+  SELECT b FROM BookingEntity b
+  WHERE b.match.id = :matchId
+  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  """)
+  Optional<BookingEntity> findActiveByMatchId(@Param("matchId") Long matchId);
+
+  @Query("""
   select new com.example.bron.booking.dto.BookingResponseDto(
   b.id,
   b.user.id,

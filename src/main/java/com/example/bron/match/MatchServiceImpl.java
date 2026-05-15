@@ -1,5 +1,9 @@
 package com.example.bron.match;
 
+import com.example.bron.booking.BookingRepository;
+import com.example.bron.booking.BookingService;
+import com.example.bron.booking.dto.CancelBookingRequestDto;
+import com.example.bron.enums.MatchStatus;
 import com.example.bron.enums.ParticipantStatus;
 import com.example.bron.exception.BadRequestException;
 import com.example.bron.exception.ConflictException;
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,8 @@ public class MatchServiceImpl implements MatchService{
   private final MatchParticipantRepository matchParticipantRepository;
   private final UserRepository userRepository;
   private final StadiumRepository stadiumRepository;
+  private final BookingRepository bookingRepository;
+  private final BookingService bookingService;
   private final MatchMapper mapper;
   private final ApplicationEventPublisher eventPublisher;
 
@@ -47,9 +54,24 @@ public class MatchServiceImpl implements MatchService{
     return null;
   }
 
+  @Transactional
   @Override
   public void delete(Long id) {
-    matchRepository.deleteById(id);
+    var match = getFindById(id);
+    if (match.getStatus() == MatchStatus.CANCELLED) {
+      throw new ConflictException("MATCH_ALREADY_CANCELLED", List.of(id.toString()));
+    }
+
+    var activeBooking = bookingRepository.findActiveByMatchId(id).orElse(null);
+    if (activeBooking != null) {
+      var cancelDto = new CancelBookingRequestDto();
+      cancelDto.setReason("Match cancelled");
+      bookingService.cancelBooking(activeBooking.getId(), cancelDto);
+      return;
+    }
+
+    match.setStatus(MatchStatus.CANCELLED);
+    matchRepository.save(match);
   }
 
   @Override

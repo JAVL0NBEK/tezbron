@@ -6,6 +6,7 @@ import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
 import com.example.bron.booking.dto.CancelBookingRequestDto;
 import com.example.bron.enums.BookingStatus;
+import com.example.bron.enums.MatchStatus;
 import com.example.bron.exception.BadRequestException;
 import com.example.bron.exception.ConflictException;
 import com.example.bron.exception.ForbiddenException;
@@ -140,6 +141,12 @@ public class BookingServiceImpl implements BookingService {
     booking.setCancelledBy(currentUser);
 
     var saved = bookingRepository.save(booking);
+
+    var match = booking.getMatch();
+    if (match != null && match.getStatus() != MatchStatus.CANCELLED) {
+      match.setStatus(MatchStatus.CANCELLED);
+      matchRepository.save(match);
+    }
 
     eventPublisher.publishEvent(new BookingEvent(
         booking.getUser().getId(),
