@@ -49,14 +49,13 @@ public class BookingServiceImpl implements BookingService {
       throw new BadRequestException("BOOKING_TIME_IN_PAST");
     }
 
-    UserEntity user;
+    UserEntity user = null;
     if (requestDto.getUserId() != null) {
       user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
           new NotFoundException("booking_user_not_fount",
               List.of(requestDto.getUserId().toString()))
       );
-    } else user = null;
-
+    }
     var stadium = stadiumRepository.findByIdForUpdate(requestDto.getStadiumId()).orElseThrow(() ->
         new NotFoundException("booking_stadium_not_found",
             List.of(requestDto.getStadiumId().toString()))
@@ -94,11 +93,13 @@ public class BookingServiceImpl implements BookingService {
 
     var saved = bookingRepository.save(entity);
 
-    eventPublisher.publishEvent(new BookingEvent(
-        user.getId(),
-        NotificationTemplate.BOOKING_CONFIRMED,
-        stadium.getName(), saved.getStartTime().toString()
-    ));
+    if (user != null) {
+      eventPublisher.publishEvent(new BookingEvent(
+          user.getId(),
+          NotificationTemplate.BOOKING_CONFIRMED,
+          stadium.getName(), saved.getStartTime().toString()
+      ));
+    }
 
     return bookingMapper.toDto(saved);
   }
