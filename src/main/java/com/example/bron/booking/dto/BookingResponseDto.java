@@ -21,4 +21,6 @@ public class BookingResponseDto {
   private Double totalPrice;
   private BookingStatus status;
   private String paymentMethod;
+  private String name;
+  private String phone;
 }

@@ -56,4 +56,7 @@ public class BookingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancelled_by_user_id")
     private UserEntity cancelledBy;
+
+    private String name;
+    private String phone;
 }

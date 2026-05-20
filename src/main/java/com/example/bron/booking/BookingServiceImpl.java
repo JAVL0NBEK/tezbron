@@ -1,6 +1,7 @@
 package com.example.bron.booking;
 
 import com.example.bron.auth.security.CurrentUserService;
+import com.example.bron.auth.user.UserEntity;
 import com.example.bron.auth.user.UserRepository;
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
@@ -48,10 +49,13 @@ public class BookingServiceImpl implements BookingService {
       throw new BadRequestException("BOOKING_TIME_IN_PAST");
     }
 
-    var user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
-        new NotFoundException("booking_user_not_fount",
-            List.of(requestDto.getUserId().toString()))
-    );
+    UserEntity user;
+    if (requestDto.getUserId() != null) {
+      user = userRepository.findById(requestDto.getUserId()).orElseThrow(() ->
+          new NotFoundException("booking_user_not_fount",
+              List.of(requestDto.getUserId().toString()))
+      );
+    } else user = null;
 
     var stadium = stadiumRepository.findByIdForUpdate(requestDto.getStadiumId()).orElseThrow(() ->
         new NotFoundException("booking_stadium_not_found",
