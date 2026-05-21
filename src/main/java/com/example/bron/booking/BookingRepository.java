@@ -81,7 +81,9 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   b.endTime,
   b.totalPrice,
   b.status,
-  b.paymentMethod
+  b.paymentMethod,
+  b.name,
+  b.phone
   ) from BookingEntity b
   where (:#{#filterParams.userId} is null or b.user.id = :#{#filterParams.userId})
   and (:#{#filterParams.stadiumId} is null or b.stadium.id = :#{#filterParams.stadiumId})
