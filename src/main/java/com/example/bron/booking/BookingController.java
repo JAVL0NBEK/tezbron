@@ -39,6 +39,19 @@ public class BookingController implements BookingApi {
   }
 
   @Override
+  public ResponseEntity<BaseResponse<BookingResponseDto>> confirmBooking(Long id) {
+    var bookingResponse = bookingService.confirmBooking(id);
+    return ResponseEntity.ok(BaseResponse.ok(bookingResponse));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<BookingResponseDto>> rejectBooking(Long id,
+      CancelBookingRequestDto rejectRequest) {
+    var bookingResponse = bookingService.rejectBooking(id, rejectRequest);
+    return ResponseEntity.ok(BaseResponse.ok(bookingResponse));
+  }
+
+  @Override
   public ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBooking(Long id, LocalDate date) {
     var bookingResponse = bookingService.getBooking(id, date);
     return ResponseEntity.ok(BaseResponse.ok(bookingResponse));

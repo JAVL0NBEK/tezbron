@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +23,12 @@ public interface TournamentApi {
   @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
   @PostMapping("/create")
   ResponseEntity<BaseResponse<TournamentResponseDto>> create(@RequestBody TournamentRequestDto tournamentRequestDto);
+
+  @PreAuthorize("hasAnyRole('SUPER_ADMIN','DISTRICT_ADMIN','OWNER')")
+  @PutMapping("/{id}")
+  ResponseEntity<BaseResponse<TournamentResponseDto>> update(
+      @PathVariable Long id,
+      @RequestBody TournamentRequestDto tournamentRequestDto);
 
   @GetMapping("/{id}")
   ResponseEntity<BaseResponse<TournamentResponseDto>> get(@PathVariable Long id);

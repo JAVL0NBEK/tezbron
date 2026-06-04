@@ -6,9 +6,21 @@ import lombok.Getter;
 public enum NotificationTemplate {
 
   // ===== Booking =====
+  BOOKING_PENDING(NotificationType.BOOKING,
+      "Bron qabul qilindi",
+      "%s stadioniga %s dagi broningiz qabul qilindi, egasi tasdiqlashini kuting"),
+
+  BOOKING_NEW_REQUEST(NotificationType.BOOKING,
+      "Yangi bron so'rovi",
+      "%s stadioniga %s ga yangi bron so'rovi keldi"),
+
   BOOKING_CONFIRMED(NotificationType.BOOKING,
       "Bron tasdiqlandi",
       "%s stadioniga %s da broningiz tasdiqlandi"),
+
+  BOOKING_REJECTED(NotificationType.BOOKING,
+      "Bron rad etildi",
+      "%s stadioniga broningiz egasi tomonidan rad etildi"),
 
   BOOKING_CANCELLED(NotificationType.BOOKING,
       "Bron bekor qilindi",

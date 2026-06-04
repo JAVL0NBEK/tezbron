@@ -33,6 +33,14 @@ public interface BookingApi {
       @PathVariable Long id,
       @Valid @RequestBody CancelBookingRequestDto cancelRequest);
 
+  @PatchMapping("/{id}/confirm")
+  ResponseEntity<BaseResponse<BookingResponseDto>> confirmBooking(@PathVariable Long id);
+
+  @PatchMapping("/{id}/reject")
+  ResponseEntity<BaseResponse<BookingResponseDto>> rejectBooking(
+      @PathVariable Long id,
+      @Valid @RequestBody CancelBookingRequestDto rejectRequest);
+
   @GetMapping("/by-stadion-id")
   ResponseEntity<BaseResponse<List<BookingResponseDto>>> getBooking(
       @RequestParam("stadionId") Long stadionId,

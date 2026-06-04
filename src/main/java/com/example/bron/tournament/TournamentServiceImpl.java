@@ -69,6 +69,38 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
+  @Transactional
+  public TournamentResponseDto update(Long id, TournamentRequestDto dto) {
+    var tournament = tournamentRepository.findById(id).orElseThrow(
+        () -> new NotFoundException("tournament_id_not_found", List.of(id.toString()))
+    );
+
+    if (currentUserService.isSuperAdmin()) {
+      if (dto.getOrganizerId() != null) {
+        var organizer = userRepository.findById(dto.getOrganizerId()).orElseThrow(
+            () -> new NotFoundException("tournament_organizer_id_not_found",
+                List.of(String.valueOf(dto.getOrganizerId())))
+        );
+        tournament.setOrganizer(organizer);
+      }
+      if (dto.getDistrictId() != null) {
+        var district = districtRepository.findById(dto.getDistrictId())
+            .orElseThrow(() -> new NotFoundException("district_not_found",
+                List.of(dto.getDistrictId().toString())));
+        tournament.setDistrict(district);
+      }
+    } else if (!currentUserService.isDistrictAdmin() && !currentUserService.isOwner()) {
+      throw new ForbiddenException("INSUFFICIENT_ROLE_TO_UPDATE_TOURNAMENT");
+    }
+
+    mapper.updateEntity(dto, tournament);
+    var savedTournament = tournamentRepository.save(tournament);
+    var response = mapper.toDto(savedTournament);
+    response.setTeamApplied(tournamentTeamRepository.countByTournamentId(id));
+    return response;
+  }
+
+  @Override
   public TournamentResponseDto get(Long id) {
     var tournament = tournamentRepository.findById(id).orElseThrow(
         () -> new NotFoundException("tournament_id_not_found",List.of(id.toString()))

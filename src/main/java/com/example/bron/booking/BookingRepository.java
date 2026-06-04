@@ -15,7 +15,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id = :stadiumId
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND b.startTime < :end
   AND b.endTime > :start
   """)
@@ -26,7 +26,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id IN :stadiumIds
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND b.startTime < :end
   AND b.endTime > :start
   """)
@@ -39,7 +39,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     select case when count(b) > 0 then true else false end
     from BookingEntity b
     where b.stadium.id = :stadiumId
-      and b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+      and b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
       and :startTime < b.endTime
       and :endTime > b.startTime
 """)
@@ -52,7 +52,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id = :stadiumId
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND cast(b.startTime as date) = :date
   """)
   List<BookingEntity> findIdAndDateBookings(Long stadiumId,
@@ -67,7 +67,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.match.id = :matchId
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   """)
   Optional<BookingEntity> findActiveByMatchId(@Param("matchId") Long matchId);
 

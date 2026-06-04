@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface TournamentService {
 
   TournamentResponseDto create(@RequestBody TournamentRequestDto tournamentRequestDto);
+  TournamentResponseDto update(Long id, TournamentRequestDto tournamentRequestDto);
   TournamentResponseDto get(Long id);
   List<TournamentResponseDto> getAll(TournamentFilterParams filterParams);
   void addTeamToTournament(Long tournamentId,

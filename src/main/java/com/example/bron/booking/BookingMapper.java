@@ -23,12 +23,18 @@ public interface BookingMapper {
   @Mapping(target = "user", ignore = true)
   @Mapping(target = "stadium", ignore = true)
   @Mapping(target = "match", ignore = true)
+  @Mapping(target = "status", ignore = true)
   BookingEntity toEntity(BookingRequestDto dto);
 
   BookingResponseDto toDto(BookingEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "user", ignore = true)
+  @Mapping(target = "stadium", ignore = true)
+  @Mapping(target = "match", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "startTime", ignore = true)
+  @Mapping(target = "endTime", ignore = true)
   void updateEntity(@MappingTarget BookingEntity entity, BookingRequestDto dto);
 
 //  @AfterMapping
