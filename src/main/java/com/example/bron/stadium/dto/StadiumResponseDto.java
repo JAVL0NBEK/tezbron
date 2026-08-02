@@ -17,6 +17,7 @@ public class StadiumResponseDto {
     private Long ownerId;
     private String ownerName;
     private String description;
+    private String address;
     private Object location;
     private StadiumType type;
     private StadiumDuration duration;
@@ -31,7 +32,7 @@ public class StadiumResponseDto {
 
 
   public StadiumResponseDto(Long id, String name, String phone, Long ownerId, String ownerName,
-      String description,
+      String description, String address,
       Object location, StadiumType type, StadiumDuration duration, Integer capacity,
       Double pricePerHour, Boolean isActive, String districtName, String regionName, Boolean isFavorite,LocalDateTime openTime, LocalDateTime closeTime) {
     this.id = id;
@@ -40,6 +41,7 @@ public class StadiumResponseDto {
     this.ownerId = ownerId;
     this.ownerName = ownerName;
     this.description = description;
+    this.address = address;
     this.location = location;
     this.type = type;
     this.duration = duration;

@@ -1,6 +1,5 @@
 package com.example.bron.booking;
 
-import com.example.bron.booking.dto.BookingResponseDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +14,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id = :stadiumId
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND b.startTime < :end
   AND b.endTime > :start
   """)
@@ -26,7 +25,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id IN :stadiumIds
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND b.startTime < :end
   AND b.endTime > :start
   """)
@@ -39,7 +38,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     select case when count(b) > 0 then true else false end
     from BookingEntity b
     where b.stadium.id = :stadiumId
-      and b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+      and b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
       and :startTime < b.endTime
       and :endTime > b.startTime
 """)
@@ -52,7 +51,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   @Query("""
   SELECT b FROM BookingEntity b
   WHERE b.stadium.id = :stadiumId
-  AND b.status <> com.example.bron.enums.BookingStatus.CANCELLED
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
   AND cast(b.startTime as date) = :date
   """)
   List<BookingEntity> findIdAndDateBookings(Long stadiumId,
@@ -65,17 +64,14 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   List<BookingEntity> findUpcomingBookings(LocalDateTime from, LocalDateTime to);
 
   @Query("""
-  select new com.example.bron.booking.dto.BookingResponseDto(
-  b.id,
-  b.user.id,
-  b.stadium.id,
-  b.match.id,
-  b.startTime,
-  b.endTime,
-  b.totalPrice,
-  b.status,
-  b.paymentMethod
-  ) from BookingEntity b
+  SELECT b FROM BookingEntity b
+  WHERE b.match.id = :matchId
+  AND b.status NOT IN (com.example.bron.enums.BookingStatus.CANCELLED, com.example.bron.enums.BookingStatus.REJECTED)
+  """)
+  Optional<BookingEntity> findActiveByMatchId(@Param("matchId") Long matchId);
+
+  @Query("""
+  select b from BookingEntity b
   where (:#{#filterParams.userId} is null or b.user.id = :#{#filterParams.userId})
   and (:#{#filterParams.stadiumId} is null or b.stadium.id = :#{#filterParams.stadiumId})
   and (:#{#filterParams.matchId} is null or b.match.id = :#{#filterParams.matchId})
@@ -86,5 +82,5 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
   and (:#{#filterParams.paymentMethod} is null or b.paymentMethod ilike %:#{#filterParams.paymentMethod}%)
   order by b.id desc
   """)
-  List<BookingResponseDto> getAll(BookingFilterParams filterParams);
+  List<BookingEntity> getAll(BookingFilterParams filterParams);
 }

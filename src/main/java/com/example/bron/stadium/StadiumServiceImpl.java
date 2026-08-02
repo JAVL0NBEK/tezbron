@@ -136,7 +136,7 @@ public class StadiumServiceImpl implements StadiumService {
 
       // 2) OwnerId bo‘yicha barcha stadionlarni olish
       var filter = new StadiumFilterParams();
-      filter.setOwnerId(stadium.getOwner().getId());
+      filter.setId(stadium.getId());
       List<StadiumResponseDto> stadiums = stadiumRepository.getByOwnerId(filter);
 
       if (stadiums.isEmpty()) {
@@ -159,7 +159,14 @@ public class StadiumServiceImpl implements StadiumService {
           .orElse(LocalTime.MAX);
 
       LocalDateTime dayRangeStart = LocalDateTime.of(date, earliestOpen);
-      LocalDateTime dayRangeEnd = LocalDateTime.of(date, latestClose);
+      LocalDateTime dayRangeEnd;
+
+      if (!latestClose.isAfter(earliestOpen)) {
+        // midnight
+        dayRangeEnd = LocalDateTime.of(date.plusDays(1), latestClose);
+      } else {
+        dayRangeEnd = LocalDateTime.of(date, latestClose);
+      }
 
       Map<Long, List<BookingEntity>> bookingsByStadium = bookingRepository
           .findConflictingBookingsForStadiums(stadiumIds, dayRangeStart, dayRangeEnd)
@@ -212,7 +219,10 @@ public class StadiumServiceImpl implements StadiumService {
       List<BookingEntity> bookings
   ) {
     LocalDateTime dayStart = LocalDateTime.of(date, stadium.getOpenTime().toLocalTime());
-    LocalDateTime dayEnd = LocalDateTime.of(date, stadium.getCloseTime().toLocalTime());
+    boolean crossesMidnight = !stadium.getCloseTime().toLocalDate()
+        .equals(stadium.getOpenTime().toLocalDate());
+    LocalDate closeDate = crossesMidnight ? date.plusDays(1) : date;
+    LocalDateTime dayEnd = LocalDateTime.of(closeDate, stadium.getCloseTime().toLocalTime());
 
     List<AvailabilitySlotRequestDto> slots = generateSlots(
         dayStart,

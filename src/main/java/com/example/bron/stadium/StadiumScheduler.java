@@ -19,7 +19,7 @@ public class StadiumScheduler {
     LocalDate today = LocalDate.now(ZoneId.of("Asia/Tashkent"));
 
     LocalDateTime openTime = LocalDateTime.of(today, LocalTime.of(8, 0));
-    LocalDateTime closeTime = LocalDateTime.of(today, LocalTime.of(23, 0));
+    LocalDateTime closeTime = LocalDateTime.of(today.plusDays(1), LocalTime.MIDNIGHT);
     stadiumService.updateAllOpenCloseTime(openTime, closeTime);
   }
 

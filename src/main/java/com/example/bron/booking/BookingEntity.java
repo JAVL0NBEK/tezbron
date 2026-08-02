@@ -56,4 +56,13 @@ public class BookingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancelled_by_user_id")
     private UserEntity cancelledBy;
+
+    private LocalDateTime confirmedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "confirmed_by_user_id")
+    private UserEntity confirmedBy;
+
+    private String name;
+    private String phone;
 }

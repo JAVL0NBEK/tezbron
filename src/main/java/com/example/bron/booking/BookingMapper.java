@@ -2,14 +2,7 @@ package com.example.bron.booking;
 
 import com.example.bron.booking.dto.BookingRequestDto;
 import com.example.bron.booking.dto.BookingResponseDto;
-import com.example.bron.enums.StadiumDuration;
 import com.example.bron.stadium.StadiumEntity;
-import com.example.bron.stadium.dto.StadiumResponseDto;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,12 +16,40 @@ public interface BookingMapper {
   @Mapping(target = "user", ignore = true)
   @Mapping(target = "stadium", ignore = true)
   @Mapping(target = "match", ignore = true)
+  @Mapping(target = "status", ignore = true)
   BookingEntity toEntity(BookingRequestDto dto);
 
+  @Mapping(target = "userId", source = "user.id")
+  @Mapping(target = "stadiumId", source = "stadium.id")
+  @Mapping(target = "stadiumName", source = "stadium.name")
+  @Mapping(target = "stadiumAddress", expression = "java(buildAddress(entity.getStadium()))")
+  @Mapping(target = "latitude", source = "stadium.location.latitude")
+  @Mapping(target = "longitude", source = "stadium.location.longitude")
+  @Mapping(target = "matchId", source = "match.id")
   BookingResponseDto toDto(BookingEntity entity);
+
+  default String buildAddress(StadiumEntity stadium) {
+    if (stadium == null) {
+      return null;
+    }
+    if (stadium.getAddress() != null && !stadium.getAddress().isBlank()) {
+      return stadium.getAddress();
+    }
+    String district = stadium.getDistrict() == null ? null : stadium.getDistrict().getName();
+    String region = stadium.getRegion() == null ? null : stadium.getRegion().getName();
+    if (district != null && region != null) {
+      return district + ", " + region;
+    }
+    return district != null ? district : region;
+  }
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "user", ignore = true)
+  @Mapping(target = "stadium", ignore = true)
+  @Mapping(target = "match", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "startTime", ignore = true)
+  @Mapping(target = "endTime", ignore = true)
   void updateEntity(@MappingTarget BookingEntity entity, BookingRequestDto dto);
 
 //  @AfterMapping

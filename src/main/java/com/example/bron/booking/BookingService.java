@@ -10,6 +10,8 @@ public interface BookingService {
   BookingResponseDto createBooking(BookingRequestDto bookingRequestDto);
   BookingResponseDto updateBooking(Long id, BookingRequestDto bookingRequestDto);
   BookingResponseDto cancelBooking(Long id, CancelBookingRequestDto dto);
+  BookingResponseDto confirmBooking(Long id);
+  BookingResponseDto rejectBooking(Long id, CancelBookingRequestDto dto);
   List<BookingResponseDto> getBooking(Long id, LocalDate date);
   List<BookingResponseDto> getBookings(BookingFilterParams filterParams);
 

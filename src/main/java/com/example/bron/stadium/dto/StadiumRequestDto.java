@@ -19,6 +19,7 @@ public class StadiumRequestDto {
     private Long regionId;
     private Long districtId;
     private String description;
+    private String address;
     private LocationDto location; // JSON string ({"lat":..., "lng":...})
     private StadiumType type;
     private StadiumDuration duration;

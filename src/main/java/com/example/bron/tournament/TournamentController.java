@@ -23,6 +23,13 @@ public class TournamentController implements TournamentApi {
   }
 
   @Override
+  public ResponseEntity<BaseResponse<TournamentResponseDto>> update(Long id,
+      TournamentRequestDto tournamentRequestDto) {
+    var tournament = tournamentService.update(id, tournamentRequestDto);
+    return ResponseEntity.ok(BaseResponse.ok(tournament));
+  }
+
+  @Override
   public ResponseEntity<BaseResponse<TournamentResponseDto>> get(Long id) {
     var tournament = tournamentService.get(id);
     return ResponseEntity.ok(BaseResponse.ok(tournament));
