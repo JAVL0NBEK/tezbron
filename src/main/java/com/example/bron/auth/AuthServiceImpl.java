@@ -39,15 +39,15 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public LoginResponseDto login(LoginRequestDto dto) {
-      boolean verified;
 
-      if (dto.getPhoneNumber().equals("991234567")){
+      boolean verified;
+      if (dto.getPhoneNumber().equals("991234567") && dto.getOtpCode().equals("1111")) {
         verified = true;
       } else {
         verified = otpService.verifyOtp(dto.getPhoneNumber(), dto.getOtpCode());
       }
 
-    if (!verified) {
+      if (!verified) {
         return new LoginResponseDto(LoginStatus.INVALID_OTP);
       }
 
