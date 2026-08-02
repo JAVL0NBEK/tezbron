@@ -15,6 +15,10 @@ public class BookingResponseDto {
   private Long id;
   private Long userId;
   private Long stadiumId;
+  private String stadiumName;
+  private String stadiumAddress;
+  private Double latitude;
+  private Double longitude;
   private Long matchId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
@@ -23,4 +27,5 @@ public class BookingResponseDto {
   private String paymentMethod;
   private String name;
   private String phone;
+  private String cancelReason;
 }

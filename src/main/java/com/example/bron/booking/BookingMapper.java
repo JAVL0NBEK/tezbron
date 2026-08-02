@@ -26,7 +26,29 @@ public interface BookingMapper {
   @Mapping(target = "status", ignore = true)
   BookingEntity toEntity(BookingRequestDto dto);
 
+  @Mapping(target = "userId", source = "user.id")
+  @Mapping(target = "stadiumId", source = "stadium.id")
+  @Mapping(target = "stadiumName", source = "stadium.name")
+  @Mapping(target = "stadiumAddress", expression = "java(buildAddress(entity.getStadium()))")
+  @Mapping(target = "latitude", source = "stadium.location.latitude")
+  @Mapping(target = "longitude", source = "stadium.location.longitude")
+  @Mapping(target = "matchId", source = "match.id")
   BookingResponseDto toDto(BookingEntity entity);
+
+  default String buildAddress(StadiumEntity stadium) {
+    if (stadium == null) {
+      return null;
+    }
+    if (stadium.getAddress() != null && !stadium.getAddress().isBlank()) {
+      return stadium.getAddress();
+    }
+    String district = stadium.getDistrict() == null ? null : stadium.getDistrict().getName();
+    String region = stadium.getRegion() == null ? null : stadium.getRegion().getName();
+    if (district != null && region != null) {
+      return district + ", " + region;
+    }
+    return district != null ? district : region;
+  }
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "user", ignore = true)

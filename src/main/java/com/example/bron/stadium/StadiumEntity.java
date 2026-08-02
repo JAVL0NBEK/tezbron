@@ -39,6 +39,8 @@ public class StadiumEntity {
 
     private String description;
 
+    private String address;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "region_id", nullable = false)
     private RegionEntity region;

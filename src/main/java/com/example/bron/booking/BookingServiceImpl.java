@@ -350,7 +350,9 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   public List<BookingResponseDto> getBookings(BookingFilterParams filterParams) {
-    return bookingRepository.getAll(filterParams);
+    return bookingRepository.getAll(filterParams).stream()
+        .map(bookingMapper::toDto)
+        .toList();
   }
 
   private BookingEntity bookingEntity(Long id){
